@@ -2,6 +2,7 @@ izanagi_server
 ==============
 
 # ソースツリー
+```
 .
 ├── LICENSE
 ├── README.md
@@ -14,4 +15,4 @@ izanagi_server
 ├── templates
 │   └── index.html
 └── tree.txt
-
+```
