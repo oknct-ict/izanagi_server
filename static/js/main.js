@@ -8,7 +8,7 @@
     });
     ws = new WebSocket("ws://nado.oknctict.tk:8000/echo");
     return $("#btn-upload").click(function() {
-      return console.log(editor.getValue());
+      return ws.send(editor.getValue());
     });
   });
 
