@@ -8,7 +8,13 @@
     });
     ws = new WebSocket("ws://nado.oknctict.tk:8000/echo");
     return $("#btn-upload").click(function() {
-      return ws.send(editor.getValue());
+      var msg;
+      msg = {
+        type: "web",
+        command: "SYN",
+        message: editor.getValue()
+      };
+      return ws.send(JSON.stringify(msg));
     });
   });
 
