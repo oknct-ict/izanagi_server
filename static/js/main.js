@@ -10,7 +10,7 @@
     return $("#btn-upload").click(function() {
       var msg;
       msg = {
-        type: "web",
+        type: "ide",
         command: "SYN",
         message: editor.getValue()
       };
