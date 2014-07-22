@@ -9,6 +9,9 @@ app = Flask(__name__);
 ide_list = [];
 android_list = [];
 
+def myprint(obj):
+	open("out.txt", "a").write(str(obj) + "\n");
+
 @app.route('/')
 def index():
 	return render_template('index.html');
@@ -69,3 +72,7 @@ def make_json(connectType, command, message):
 		"message":message});
 	return jsonData;
 
+if __name__ == '__main__':
+		app.debug = True
+		server = WSGIServer(('0.0.0.0', 5000), app, handler_class=WebSocketHandler);
+		server.serve_forever();
