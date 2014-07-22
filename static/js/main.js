@@ -6,7 +6,7 @@
       mode: "text/x-vb",
       matchBrackets: true
     });
-    ws = new WebSocket("ws://nado.oknctict.tk:8000/echo");
+    ws = new WebSocket("ws://nado.oknctict.tk:5000/echo");
     return $("#btn-upload").click(function() {
       var msg;
       msg = {
