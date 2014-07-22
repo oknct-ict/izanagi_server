@@ -1,7 +1,8 @@
 import os
 from geventwebsocket.handler import WebSocketHandler
 from gevent.pywsgi import WSGIServer
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, g, redirect
+import pymongo
 import json
 
 app = Flask(__name__);
@@ -14,17 +15,21 @@ def myprint(obj):
 
 @app.route('/')
 def index():
+	myprint("index read");
 	return render_template('index.html');
 
 @app.route('/echo')
 def echo():
-	if request.environ.get('esgi.websocket'):
+	myprint("echo come");
+	if request.environ.get('wsgi.websocket'):
 		websock = request.environ['wsgi.websocket'];
 		while True:
 			data = websock.receive();
 			if not data:
 				break;
+			myprint("websock get");
 			jsonData = json.loads(data);
+			myprint(jsonData);
 			append_list_websock(websock, jsonData["type"]);
 			send_response(websock, jsonData["type"], jsonData["command"], jsonData["message"]);
 	return;				
