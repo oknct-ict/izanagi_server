@@ -6,6 +6,9 @@ import json
 
 app = Flask(__name__);
 
+ide_list = [];
+android_list = [];
+
 @app.route('/')
 def index():
 	return render_template('index.html');
