@@ -29,9 +29,9 @@ def echo():
 			append_list_websock(websock, jsonData["type"]);
 			send_response(websock, jsonData["type"], jsonData["command"], jsonData["message"]);
 			for ws in ide_list:
-				print("ide:" + ws);
+				print(ws);
 			for ws in android_list:
-				print("and:" + ws);
+				print(ws);
 	return;				
 
 def append_list_websock(websock, connectType):
