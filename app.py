@@ -28,6 +28,10 @@ def echo():
 			print(jsonData);
 			append_list_websock(websock, jsonData["type"]);
 			send_response(websock, jsonData["type"], jsonData["command"], jsonData["message"]);
+			for ws in ide_list:
+				print("ide:" + ws);
+			for ws in android_list:
+				print("and:" + ws);
 	return;				
 
 def append_list_websock(websock, connectType):
@@ -64,6 +68,7 @@ def send_source_to_android(message):
 def send_ack(websock, connectType):
 	jsonData = make_json(connectType, "ACK", "");
 	websock.send(jsonData);
+	print("send_ack:" + jsonData);
 	return;
 
 def make_json(connectType, command, message):
