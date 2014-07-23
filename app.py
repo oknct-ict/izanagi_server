@@ -32,7 +32,7 @@ def echo():
 				print(ws);
 			for ws in android_list:
 				print(ws);
-	return;				
+	return "Disconnect";				
 
 def append_list_websock(websock, connectType):
 	if connectType == "ide":
