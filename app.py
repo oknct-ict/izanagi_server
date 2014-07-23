@@ -10,26 +10,22 @@ app = Flask(__name__);
 ide_list = [];
 android_list = [];
 
-def myprint(obj):
-	open("out.txt", "a").write(str(obj) + "\n");
-
 @app.route('/')
 def index():
-	myprint("index read");
 	return render_template('index.html');
 
 @app.route('/echo')
 def echo():
-	myprint("echo come");
+	print("echo come");
 	if request.environ.get('wsgi.websocket'):
 		websock = request.environ['wsgi.websocket'];
 		while True:
 			data = websock.receive();
 			if not data:
 				break;
-			myprint("websock get");
+			print("websock get");
 			jsonData = json.loads(data);
-			myprint(jsonData);
+			print(jsonData);
 			append_list_websock(websock, jsonData["type"]);
 			send_response(websock, jsonData["type"], jsonData["command"], jsonData["message"]);
 	return;				
