@@ -14,5 +14,5 @@ izanagi_server
 │   └── js
 ├── templates
 │   └── index.html
-└── tree.txt
+└─app.py 
 ```
