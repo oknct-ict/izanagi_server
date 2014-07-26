@@ -7,8 +7,7 @@ import json
 
 app = Flask(__name__);
 
-ide_list = [];
-android_list = [];
+connect_list = {"ide":[], "android":[]};
 
 @app.route('/')
 def index():
@@ -24,34 +23,22 @@ def echo():
 			if not data:
 				break;
 			print("websock get");
-			jsonData = json.loads(data);
-			print(jsonData);
-			append_list_websock(websock, jsonData["type"]);
-			send_response(websock, jsonData["type"], jsonData["command"], jsonData["message"]);
-			for ws in ide_list:
-				print(ws);
-			for ws in android_list:
-				print(ws);
+			json_data = json.loads(data);
+			print(json_data);
+			append_list_websock(websock, json_data["type"]);
+			send_response(websock, json_data["type"], json_data["command"], json_data["message"]);
+			output_websock();
 	return "Disconnect";				
 
-def append_list_websock(websock, connectType):
-	if connectType == "ide":
-		if is_websock_list(ide_list, websock) == True:
-			return;
-		ide_list.append(websock);
-	else:
-		if is_websock_list(android_list, websock) == True:
-				return;
-		android_list.append(websock);
-	return;
+def is_valid_websock(websock, connect_type):
+	return websock in connect_list[connect_type];
 
-def is_websock_list(lists, websock):
-	for ws in lists:
-		if ws == websock:
-			return True;
-	return False;	
+def append_list_websock(websock, connect_type):
+	if is_valid_websock(websock, connect_type):
+		return;
+	connect_list[connect_type].append(websock);
 
-def send_response(websock, connectType, command, message):
+def send_response(websock, connect_type, command, message):
 	if command == "SYN":
 		if message != "":
 			send_source_to_android(message);
@@ -60,24 +47,33 @@ def send_response(websock, connectType, command, message):
 	return;
 
 def send_source_to_android(message):
-	jsonData = make_json("android", "SYN", message);
-	for ws in android_list:
-		ws.send(jsonData);
+	json_data = make_json("android", "SYN", message);
+	for ws in connect_list["android"]:
+		ws.send(json_data);
 	return;
 		
 def send_ack(websock, connectType):
-	jsonData = make_json(connectType, "ACK", "");
-	websock.send(jsonData);
-	print("send_ack:" + jsonData);
+	json_data = make_json(connectType, "ACK", "");
+	websock.send(json_data);
+	print("send_ack:" + json_data);
 	return;
 
 def make_json(connectType, command, message):
-	jsonData = json.dumps({
+	json_data = json.dumps({
 		"type":connectType,
 		"command":command,
 		"message":message});
-	return jsonData;
+	return json_data;
 
+def output_websock():
+	print("===output===\nide");
+	for ws in connect_list["ide"]:
+		print(ws);
+	print("android");
+	for ws in connect_list["android"]:
+		print(ws);
+	print("===end===");
+	
 if __name__ == '__main__':
 		app.debug = True
 		server = WSGIServer(('0.0.0.0', 5000), app, handler_class=WebSocketHandler);
