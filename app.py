@@ -62,13 +62,13 @@ def receive_android_syn(websock, message):
 	senc_ack(websock, ANDROID);
 	return;
 
-def is_connectioned(websock, connect_type):
-	return websock in connect_list[connect_type];
-
 def append_connection(websock, connect_type):
 	if is_connectioned(websock, connect_type):
 		return;
 	connect_list[connect_type].append(websock);
+
+def is_connectioned(websock, connect_type):
+	return websock in connect_list[connect_type];
 
 def send_ack(websock, connect_type):
 	json_data = make_json(connect_type, ACK, "");
