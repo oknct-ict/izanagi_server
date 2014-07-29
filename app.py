@@ -29,7 +29,7 @@ def echo():
 			print("websock get");
 			json_data = json.loads(data);
 			print(json_data);
-			append_list_websock(websock, json_data["type"]);
+			append_connection(websock, json_data["type"]);
 			if json_data["type"] == IDE:
 				if json_data["command"] == "SYN":
 					send_ack(websock, IDE);
@@ -40,11 +40,11 @@ def echo():
 			output_websock();
 	return "Disconnect";				
 
-def is_valid_websock(websock, connect_type):
+def is_connectioned(websock, connect_type):
 	return websock in connect_list[connect_type];
 
-def append_list_websock(websock, connect_type):
-	if is_valid_websock(websock, connect_type):
+def append_connection(websock, connect_type):
+	if is_connectioned(websock, connect_type):
 		return;
 	connect_list[connect_type].append(websock);
 
@@ -55,8 +55,6 @@ def send_ack(websock, connect_type):
 	return;
 
 def send_source_to_android(source):
-	if source == NULL_CHARACTER:
-		return;
 	json_data = make_json(ANDROID, "ACK", source);
 	for ws in connect_list[ANDROID]:
 		ws.send(json_data);
