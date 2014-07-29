@@ -19,7 +19,6 @@ def index():
 
 @app.route('/echo')
 def echo():
-	print("echo come");
 	if request.environ.get('wsgi.websocket'):
 		websock = request.environ['wsgi.websocket'];
 		while True:
@@ -27,9 +26,7 @@ def echo():
 			if not data:
 				break;
 			json_data = json.loads(data);
-			print(json_data);
 			receive(websock, json_data);
-			output_websock();
 	return "Disconnect";				
 
 def receive(websock, json_data):
@@ -73,7 +70,6 @@ def is_connectioned(websock, connect_type):
 def send_ack(websock, connect_type):
 	json_data = make_json(connect_type, ACK, "");
 	websock.send(json_data);
-	print("send_ack:" + json_data);
 	return;
 
 def send_source_to_android(source):
@@ -90,7 +86,8 @@ def make_json(connect_type, command, message):
 	return json_data;
 
 def output_websock():
-	print("===output===\nide");
+	print("===output===");
+	print(IDE);
 	for ws in connect_list[IDE]:
 		print(ws);
 	print(ANDROID);
