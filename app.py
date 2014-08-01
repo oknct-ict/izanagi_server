@@ -56,7 +56,7 @@ def receive_ide_syn(websock, message):
 	return;
 
 def receive_android_syn(websock, message):
-	senc_ack(websock, ANDROID);
+	send_ack(websock, ANDROID);
 	return;
 
 def append_connection(websock, connect_type):
