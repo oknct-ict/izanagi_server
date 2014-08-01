@@ -27,6 +27,7 @@ def echo():
 				break;
 			json_data = json.loads(data);
 			receive(websock, json_data);
+			output_websock();
 	return "Disconnect";				
 
 def receive(websock, json_data):
@@ -75,7 +76,8 @@ def send_ack(websock, connect_type):
 def send_source_to_android(source):
 	json_data = make_json(ANDROID, ACK, source);
 	for ws in connect_list[ANDROID]:
-		ws.send(json_data);
+		if not ws.closed: 
+			ws.send(json_data);
 	return;
 
 def make_json(connect_type, command, message):
