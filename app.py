@@ -19,6 +19,7 @@ def index():
 
 @app.route('/echo')
 def echo():
+	websock = "";
 	if request.environ.get('wsgi.websocket'):
 		websock = request.environ['wsgi.websocket'];
 		while True:
@@ -28,6 +29,7 @@ def echo():
 			json_data = json.loads(data);
 			receive(websock, json_data);
 			output_websock();
+	disconnect_websock(websock);
 	return "Disconnect";				
 
 def receive(websock, json_data):
@@ -78,6 +80,15 @@ def send_source_to_android(source):
 	for ws in connect_list[ANDROID]:
 		if not ws.closed: 
 			ws.send(json_data);
+		else:
+			connect_list[ANDROID].remove(ws);
+	return;
+
+def disconnect_websock(websock):
+	if websock in connect_list[IDE]:
+		connect_list[IDE].remove(websock);
+	elif websock in connect_list[ANDROID]:
+		connect_list[ANDROID].remove(websock);
 	return;
 
 def make_json(connect_type, command, message):
