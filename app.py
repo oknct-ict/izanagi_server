@@ -28,7 +28,6 @@ def echo():
 				break;
 			json_data = json.loads(data);
 			receive(websock, json_data);
-			output_websock();
 	disconnect_websock(websock);
 	return "Disconnect";				
 
