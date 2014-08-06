@@ -8,6 +8,12 @@ izanagi_server
 ├── README.md
 ├── server
 │   └── __init__.py
+│   └── connection_manager.py
+│   └── connection_types.py
+│   └── myandroid.py
+│   └── mycommand.py
+│   └── myconst.py
+│   └── myide.py
 ├── static
 │   ├── coffee
 │   ├── css
