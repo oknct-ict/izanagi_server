@@ -1,6 +1,6 @@
 from geventwebsocket.handler import WebSocketHandler
 from gevent.pywsgi import WSGIServer
-import myconnect
+from connection_manager import CONNECTION_MANAGER
 import myconst
 import json
 
@@ -11,8 +11,8 @@ def send_ack(websock, connect_type):
 
 def send_source_to_android(source):
 	json_data = make_json(myconst.ANDROID, myconst.ACK, source);
-	ws = myconnect.get_websocket(myconst.ANDROID);
-	if not (ws is None):
+	ws_list = CONNECTION_MANAGER.get_connections(myconst.ANDROID);
+	for ws in ws_list:
 		ws.send(json_data);
 	return;
 
