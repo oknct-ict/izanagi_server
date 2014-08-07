@@ -5,7 +5,8 @@
 This module import by
 form connection_manager impot CONNECTION_MANAGER
 """
-
+from flask import g
+import pymongo
 import connection_types
 
 class _ConnectionManager(object):
@@ -31,6 +32,11 @@ class _ConnectionManager(object):
     def output(self, connection_type):
         for ws in self._connections[connection_type]:
             print(ws);
+
+    def check_user(self, user):
+        print(user);
+        print(g.db.users.find_one({"id":user}));
+        return (g.db.users.find_one({"id":user}));
 
 CONNECTION_MANAGER = _ConnectionManager()
 

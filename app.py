@@ -26,6 +26,8 @@ def echo():
                 break;
             json_data = json.loads(data);
             receive(websock, json_data);
+            CONNECTION_MANAGER.output(myconst.IDE);
+    print "Disconnect";
     CONNECTION_MANAGER.remove(myconst.IDE, websock);
     CONNECTION_MANAGER.remove(myconst.ANDROID, websock);
     return "Disconnect";
@@ -34,12 +36,23 @@ def receive(websock, json_data):
     connect_type = json_data["type"];
     command = json_data["command"];
     message = json_data["message"];
+    if CONNECTION_MANAGER.check_user(message) is None:
+        return;
     CONNECTION_MANAGER.append(connect_type, websock);
     if connect_type == myconst.IDE:
         myide.receive_ide(websock, command, message);
     else:
         myandroid.receive_android(websock, command, message);
     return;
+
+@app.before_request
+def before_request():
+    g.conn = pymongo.Connection();
+    g.db = g.conn["izanagi_db"];
+
+@app.teardown_request
+def teardown_request(exception):
+    g.conn.close();
 
 if __name__ == '__main__':
         app.debug = True
