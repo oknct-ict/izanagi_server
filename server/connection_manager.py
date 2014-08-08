@@ -24,7 +24,6 @@ class _ConnectionManager(object):
 
     @connection_types.validater(1)
     def remove(self, connection_type, user_id):
-        print "remove now";
         if self.get_connections(connection_type, user_id) is None:
             return myconst.ERROR_NO_USER;
         del  self._connections[connection_type][user_id];
@@ -33,8 +32,6 @@ class _ConnectionManager(object):
     @connection_types.validater(1)
     def append(self, connection_type, connection, user_id):
         self._connections[connection_type].update({user_id:connection});
-        print "append after:";
-        print self._connections[connection_type].items();
         return myconst.SUCCESS;
 
     @connection_types.validater(1)

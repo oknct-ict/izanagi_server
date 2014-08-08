@@ -26,10 +26,7 @@ def echo():
                 break;
             json_data = json.loads(data);
             user_id = json_data["id"];
-            print(json_data);
             receive(websock, json_data);
-            CONNECTION_MANAGER.output(myconst.IDE);
-    print "Disconnect";
     CONNECTION_MANAGER.remove(myconst.IDE, user_id);
     CONNECTION_MANAGER.remove(myconst.ANDROID, user_id);
     return "Disconnect";

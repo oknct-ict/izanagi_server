@@ -22,8 +22,6 @@ def receive_ide(websock, user_id, command, data):
     # delete
     elif command == myconst.DELETE_REQ:
         res = receive_ide_delete(websock, user_id, data);
-    print "receive_ide:";
-    print res;
     return res;
 
 def receive_ide_login(websock, user_id, password):
