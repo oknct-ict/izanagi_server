@@ -17,7 +17,7 @@ def index():
 
 @app.route('/echo')
 def echo():
-    websock = "";
+    user_id = "";
     if request.environ.get('wsgi.websocket'):
         websock = request.environ['wsgi.websocket'];
         while True:
@@ -25,24 +25,25 @@ def echo():
             if not data:
                 break;
             json_data = json.loads(data);
+            user_id = json_data["id"];
+            print(json_data);
             receive(websock, json_data);
             CONNECTION_MANAGER.output(myconst.IDE);
     print "Disconnect";
-    CONNECTION_MANAGER.remove(myconst.IDE, websock);
-    CONNECTION_MANAGER.remove(myconst.ANDROID, websock);
+    CONNECTION_MANAGER.remove(myconst.IDE, user_id);
+    CONNECTION_MANAGER.remove(myconst.ANDROID, user_id);
     return "Disconnect";
 
 def receive(websock, json_data):
     connect_type = json_data["type"];
+    user_id = json_data["id"];
     command = json_data["command"];
-    message = json_data["message"];
-    if CONNECTION_MANAGER.check_user(message) is None:
-        return;
-    CONNECTION_MANAGER.append(connect_type, websock);
+    data = json_data["data"];
+    result = json_data["result"];
     if connect_type == myconst.IDE:
-        myide.receive_ide(websock, command, message);
+        myide.receive_ide(websock, user_id, command, data);
     else:
-        myandroid.receive_android(websock, command, message);
+        myandroid.receive_android(websock, user_id, command, data);
     return;
 
 @app.before_request
