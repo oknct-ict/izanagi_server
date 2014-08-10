@@ -12,4 +12,6 @@ def receive_android_login(user_id, password):
     res = CONNECTION_MANAGER.check_user_db(user_id, password)
     if res is SUCCESS:
         res = CONNECTIOM_MANAGER.append(ANDROID, websock, user_id);
+    
+    mycommand.send_websock(websock, myconst.ANDROID, user_id, myconst.LOGIN_RES, myconst.ERROR_NO_USER, res);
     return res;

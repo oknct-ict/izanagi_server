@@ -24,7 +24,7 @@ class _ConnectionManager(object):
     @connection_types.validater(1)
     def remove(self, connection_type, user_id):
         if self.get_connections(connection_type, user_id) is None:
-            return myconst.ERROR_NO_USER;
+            return myconst.FAILED;
         del  self._connections[connection_type][user_id];
         return myconst.SUCCESS;
 
@@ -41,7 +41,7 @@ class _ConnectionManager(object):
 
     def check_user_db(self, user_id, password):
         if (g.db.users.find_one({"id":user_id, "pass":password})) is None:
-            return myconst.ERROR_NO_USER;
+            return myconst.FAILED;
         return myconst.SUCCESS;
 
 CONNECTION_MANAGER = _ConnectionManager()
