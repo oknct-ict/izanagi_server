@@ -25,7 +25,7 @@ def receive_ide(websock, user_id, command, data):
     return res;
 
 def receive_ide_login(websock, user_id, password):
-    res = CONNECTION_MANAGER.check_user(user_id, password);
+    res = CONNECTION_MANAGER.check_user_db(user_id, password);
     if res is myconst.SUCCESS:
         res = CONNECTION_MANAGER.append(myconst.IDE, websock, user_id);
     return res;

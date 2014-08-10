@@ -17,10 +17,9 @@ class _ConnectionManager(object):
             self._connections[connection_type] = {}
 
     @connection_types.validater(1)
-    def get_connections(self, connection_type, user_id):
-        if user_id in self._connections[connection_type]:
-            return self._connections[connection_type][user_id];
-        return None;
+    def append(self, connection_type, connection, user_id):
+        self._connections[connection_type].update({user_id:connection});
+        return myconst.SUCCESS;
 
     @connection_types.validater(1)
     def remove(self, connection_type, user_id):
@@ -30,16 +29,17 @@ class _ConnectionManager(object):
         return myconst.SUCCESS;
 
     @connection_types.validater(1)
-    def append(self, connection_type, connection, user_id):
-        self._connections[connection_type].update({user_id:connection});
-        return myconst.SUCCESS;
-
-    @connection_types.validater(1)
     def output(self, connection_type):
         print connection_type;
         print self._connections[connection_type].items();
+    
+    @connection_types.validater(1)
+    def get_connections(self, connection_type, user_id):
+        if user_id in self._connections[connection_type]:
+            return self._connections[connection_type][user_id];
+        return None;
 
-    def check_user(self, user_id, password):
+    def check_user_db(self, user_id, password):
         if (g.db.users.find_one({"id":user_id, "pass":password})) is None:
             return myconst.ERROR_NO_USER;
         return myconst.SUCCESS;

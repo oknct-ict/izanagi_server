@@ -9,7 +9,7 @@ def receive_android(websock, user_id, command, data):
     return res;
 
 def receive_android_login(user_id, password):
-    res = CONNECTION_MANAGER.check_user(user_id, password)
+    res = CONNECTION_MANAGER.check_user_db(user_id, password)
     if res is SUCCESS:
         res = CONNECTIOM_MANAGER.append(ANDROID, websock, user_id);
     return res;
