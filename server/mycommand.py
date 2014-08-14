@@ -6,6 +6,7 @@ from gevent.pywsgi import WSGIServer
 import myconst
 import json
 import random
+import hashlib
 from connection_manager import CONNECTION_MANAGER
     
 def send_ide(websock, session_id, command, data):
@@ -29,7 +30,7 @@ def make_json(connect_type, session_id, command, data):
         "data":data});
     return json_data;
 
-def random_str(length):
+def get_random_str(length):
     strlist = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz123456789";
     random_str = "";
     for i in range(length):
@@ -38,4 +39,6 @@ def random_str(length):
     print random_str;
     return random_str;
 
+def get_sha256(password):
+    return hashlib.sha256(password).hexdigest();
 
