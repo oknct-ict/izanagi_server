@@ -7,7 +7,7 @@ $(() ->
     }
   )
 
-  ws = new WebSocket("ws://nado.oknctict.tk:5000/websock/ide")
+  ws = new WebSocket("ws://nado.oknctict.tk:5000/websock/ide/")
   session_id = null
 
   ws.onclose = ws.onerror = (error) ->
