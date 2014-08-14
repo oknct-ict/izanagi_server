@@ -18,7 +18,7 @@ def index():
 
 @app.route('/websock/ide/')
 def websock_ide():
-    websock = "";
+    websock = None;
     if request.environ.get('wsgi.websocket'):
         websock = request.environ['wsgi.websocket'];
         while True:
@@ -29,12 +29,13 @@ def websock_ide():
             session_id, command, data = get_json(json_data);
             session_id, command, data = myide.receive_ide(websock, session_id, command, data);
             mycommand.send_ide(websock, session_id, command, data);
-    CONNECTION_MANAGER.remove(myconst.IDE, websock);
+    if websock is not None:
+        CONNECTION_MANAGER.remove(myconst.IDE, websock);
     return "Disconnect";
 
 @app.route('/websock/android/')
 def websock_android():
-    websock = "";
+    websock = None;
     if request.environ.get('wsgi.websocket'):
         websock = request.environ['wsgi.websocket'];
         while True:
@@ -42,7 +43,8 @@ def websock_android():
             if not data:
                 break;
             json_data = json.loads(data);
-    CONNECTION_MANAGER.remove(myconst.ANDROID, websock);
+    if websock is not None:
+        CONNECTION_MANAGER.remove(myconst.ANDROID, websock);
     return "Disconnect";
 
 def get_json(json_data):
