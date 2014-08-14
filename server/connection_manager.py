@@ -19,7 +19,7 @@ class _ConnectionManager(object):
 
     @connection_types.validater(1)
     def append(self, connection_type, connection, user_id):
-        session_id = mycommand.random_str(16);
+        session_id = mycommand.get_random_str(16);
         self._connections[connection_type].update({session_id: {USER:user_id, CONN:connection}});
         return session_id;
         

@@ -18,7 +18,7 @@ def receive_ide(websock, session_id, command, data):
         # login accept 
         if session_id is None:
             session_id = "";
-            data = {RES:myconst.ERROR_NO_USER};
+            data = {RES:myconst.USER_DATA_FAULT};
         else:
             data = {RES:myconst.OK};
         
