@@ -31,6 +31,8 @@ def websock_ide():
                 break;
             json_data = json.loads(data);
             session_id, command, data = get_json(json_data);
+            if command == myconst.LOGIN_REQ and session_id != "":
+                CONNECTION_MANAGER.delete(myconst.IDE, session_id);
             session_id, command, data = myide.receive_ide(websock, session_id, command, data);
             mycommand.send_ide(websock, session_id, command, data);
     if session_id is not "":
