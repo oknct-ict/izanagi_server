@@ -16,4 +16,5 @@ LOGIN_RES = "login_RES"
 
 # error
 USER_DATA_FAULT = 100
+ACCESS_POINT_OVER = 101
 

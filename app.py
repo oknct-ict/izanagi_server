@@ -22,7 +22,7 @@ def test():
 
 @app.route('/websock/ide/')
 def websock_ide():
-    websock = None;
+    session_id = "";
     if request.environ.get('wsgi.websocket'):
         websock = request.environ['wsgi.websocket'];
         while True:
@@ -33,8 +33,8 @@ def websock_ide():
             session_id, command, data = get_json(json_data);
             session_id, command, data = myide.receive_ide(websock, session_id, command, data);
             mycommand.send_ide(websock, session_id, command, data);
-    if websock is not None:
-        CONNECTION_MANAGER.remove(myconst.IDE, websock);
+    if session_id is not "":
+        CONNECTION_MANAGER.delete(myconst.IDE, session_id);
     return "Disconnect";
 
 @app.route('/websock/android/')
@@ -56,12 +56,6 @@ def get_json(json_data):
     command = json_data["command"];
     data = json_data["data"];
     return (session_id, command, data);
-
-    if connect_type == myconst.IDE:
-        myide.receive_ide(websock, session_id, command, data);
-    else:
-        myandroid.receive_android(websock, session_id, command, data);
-    return;
 
 @app.before_request
 def before_request():

@@ -14,14 +14,8 @@ def receive_ide(websock, session_id, command, data):
     # login
     if command == myconst.LOGIN_REQ:
         command = myconst.LOGIN_RES;
-        session_id = receive_ide_login(websock, data[USER], data[PASS]);
-        # login accept 
-        if session_id is None:
-            session_id = "";
-            data = {RES:myconst.USER_DATA_FAULT};
-        else:
-            data = {RES:myconst.OK};
-        
+        session_id, res = receive_ide_login(websock, data[USER], data[PASS]);
+        data = {RES:res};
     # save
     elif command == myconst.SAVE_REQ:
         receive_ide_save();
@@ -34,7 +28,6 @@ def receive_ide(websock, session_id, command, data):
     # delete
     elif command == myconst.DELETE_REQ:
         receive_ide_delete();
-    
     # response
     print session_id, command, data;
     return (session_id, command, data);
@@ -43,10 +36,14 @@ def receive_ide_login(websock, user_id, password):
     # userdata check
     if user_manager.check_db(user_id, password) is False:
         # no user data 
-        return None;
+        return ("", myconst.USER_DATA_FAULT);
+    # access_point num check
+    if CONNECTION_MANAGER.possible_append(myconst.IDE, user_id) is False:
+        # access_point is over 
+        return ("", myconst.ACCESS_POINT_OVER);
     # connection 
     session_id = CONNECTION_MANAGER.append(myconst.IDE, websock, user_id);
-    return session_id;
+    return (session_id, myconst.OK);
 
 def receive_ide_save():
     return;
