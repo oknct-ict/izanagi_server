@@ -2,15 +2,18 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<script src="static/js/jquery-1.10.0.min.js"></script>
-	<script src="static/js/codemirror.js"></script>
-	<script src="static/js/vb.js"></script>
-	<script src="static/js/main.js"></script>
 	<link rel="stylesheet" href="static/css/codemirror.css">
 	<link rel="stylesheet" href="static/css/bootmetro.css">
 	<link rel="stylesheet" href="static/css/bootmetro-icons.css">
 	<link rel="stylesheet" href="static/css/bootmetro-ui-light.css">
 	<link rel="stylesheet" href="static/css/main.css">
+	<script src="//code.jquery.com/jquery-1.10.0.min.js"></script>
+  <script src="static/js/jquery.sha256.min.js"></script>
+	<script src="static/js/modernizr-2.6.2.min.js"></script>
+	<script src="static/js/bootstrap.js"></script>
+	<script src="static/js/codemirror.js"></script>
+	<script src="static/js/vb.js"></script>
+	<script src="static/js/main.js"></script>
 	<title>Test</title>
 </head>
 <body>
@@ -23,7 +26,28 @@
 			<span class="win-commandicon win-commandring icon-floppy"></span>
 			<span class="win-label">Save</span>
 		</a>
+    	<a href="#loginModal" class="win-command win-command-small" data-toggle="modal">
+    		<span class="win-commandicon win-commandring icon-login"></span>
+    		<span class="win-label">Login</span>
+    	</a>
 	</div>
+
+	<div id="loginModal" class="modal hide fade">
+		<div class="modal-header">
+			<button class="close" type="button" data-dismiss="modal" aria-hidden="true"></button>
+			<h3>Login</h3>
+		</div>
+		<div class="modal-body">
+			<label for="user_id">UserID</label>
+			<input type="text" name="user_id" id="user_id">
+			<label for="passwd">Password</label>
+			<input type="text" name="passwd" id="passwd">
+		</div>
+		<div class="modal-footer">
+			<a href="#" class="btn btn-primary" id="btn-login">Login</a>
+		</div>
+	</div>
+
 	<div class="editor-space">
 		<textarea id="editor"></textarea>
 	</div>
