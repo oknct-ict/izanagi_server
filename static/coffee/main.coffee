@@ -14,14 +14,16 @@ $(() ->
     alert "please reload web page"
 
   ws.onmessage = (event) ->
-    msg = event.data
+    msg = JSON.parse(event.data)
     console.log msg
     if msg.command == "login_RES"
       if msg.data.result < 100
         session_id = msg.session_id
         $("#loginModal").modal("hide")
+        0
       else
         $("#loginModal").modal("show")
+        0
 
   make_msg = (command, data) ->
     if session_id == null

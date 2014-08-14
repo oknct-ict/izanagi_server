@@ -13,14 +13,16 @@
     };
     ws.onmessage = function(event) {
       var msg;
-      msg = event.data;
+      msg = JSON.parse(event.data);
       console.log(msg);
       if (msg.command === "login_RES") {
         if (msg.data.result < 100) {
           session_id = msg.session_id;
-          return $("#loginModal").modal("hide");
+          $("#loginModal").modal("hide");
+          return 0;
         } else {
-          return $("#loginModal").modal("show");
+          $("#loginModal").modal("show");
+          return 0;
         }
       }
     };
