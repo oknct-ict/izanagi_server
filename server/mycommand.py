@@ -11,11 +11,15 @@ from connection_manager import CONNECTION_MANAGER
     
 def send_ide(websock, session_id, command, data):
     json_data = make_json(myconst.IDE, session_id, command, data);
-    print "send_ide_no";
+    # session_id whether correct websock?
     get_ws = CONNECTION_MANAGER.get_connection(myconst.IDE, session_id);
-    print websock, get_ws;
+    # correct
     if websock == get_ws:
         websock.send(json_data);
+    else:
+        # if login case, need response
+        if command == myconst.LOGIN_RES:
+            websock.send(json_data);
 
 def send_android(websock, session_id, command, data):
     json_data = make_json(myconst.ANDROID, session_id, command, data);

@@ -16,11 +16,10 @@ def append(user_id, password, mail):
     
 def check_db(user_id, password):
     pass_sha256 = mycommand.get_sha256(password);
-    print user_id, pass_sha256;
     if g.db.users.find_one({USER:user_id, PASS:pass_sha256}) is None:
-        print "no_user"
+        print user_id, password, pass_sha256,  "no_user"
         return False;
-    print "yse"
+    print user_id, "user data correct."
     return True;
 
 
