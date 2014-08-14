@@ -6,7 +6,7 @@
       mode: "text/x-vb",
       matchBrackets: true
     });
-    ws = new WebSocket("ws://nado.oknctict.tk:5000/websock/ide");
+    ws = new WebSocket("ws://nado.oknctict.tk:5000/websock/ide/");
     session_id = null;
     ws.onclose = ws.onerror = function(error) {
       return alert("please reload web page");
