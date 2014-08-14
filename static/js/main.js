@@ -41,7 +41,7 @@
     $("#btn-login").click(function() {
       var msg, passwd, user_id;
       user_id = $("#user_id").val();
-      passwd = $.sha256($("#passwd"));
+      passwd = $("#passwd").val();
       msg = make_msg("login", {
         user_id: user_id,
         password: passwd
