@@ -1,25 +1,41 @@
+#!/usr/bin/env python
+#coding:utf-8
+
 from geventwebsocket.handler import WebSocketHandler
 from gevent.pywsgi import WSGIServer
-from connection_manager import CONNECTION_MANAGER
 import myconst
 import json
+import random
+from connection_manager import CONNECTION_MANAGER
+    
+def send_ide(websock, session_id, command, data):
+    json_data = make_json(myconst.IDE, session_id, command, data);
+    print "send_ide_no";
+    get_ws = CONNECTION_MANAGER.get_connection(myconst.IDE, session_id);
+    print websock, get_ws;
+    if websock == get_ws:
+        websock.send(json_data);
 
-def send_ack(websock, connect_type):
-	json_data = make_json(connect_type, myconst.ACK, "");
-	websock.send(json_data);
-	return;
+def send_android(websock, session_id, command, data):
+    json_data = make_json(myconst.ANDROID, session_id, command, data);
+    get_ws = get_conection(session_id);
+    ws.send(json_data);
 
-def send_source_to_android(source):
-	json_data = make_json(myconst.ANDROID, myconst.ACK, source);
-	ws_list = CONNECTION_MANAGER.get_connections(myconst.ANDROID);
-	for ws in ws_list:
-		ws.send(json_data);
-	return;
+def make_json(connect_type, session_id, command, data):
+    json_data = json.dumps({
+        "type":connect_type,
+        "session_id":session_id,
+        "command":command,
+        "data":data});
+    return json_data;
 
-def make_json(connect_type, command, message):
-	json_data = json.dumps({
-		"type":connect_type,
-		"command":command,
-		"message":message});
-	return json_data;
+def random_str(length):
+    strlist = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz123456789";
+    random_str = "";
+    for i in range(length):
+        x = random.randint(0, len(strlist) - 1);
+        random_str += strlist[x];
+    print random_str;
+    return random_str;
+
 
