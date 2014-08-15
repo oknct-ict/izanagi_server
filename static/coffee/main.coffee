@@ -47,6 +47,7 @@ $(() ->
     if msg.command == "register_RES"
       if msg.data.result < 100
         session_id = msg.session_id
+        $("#registerModal").modal("hide")
       else
         show_toast "ユーザ登録に失敗しました"
     0
