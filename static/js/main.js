@@ -43,7 +43,15 @@
           session_id = msg.session_id;
           $("#loginModal").modal("hide");
         } else {
+          session_id = null;
           show_toast("ログインに失敗しました");
+        }
+      }
+      if (msg.command === "register_RES") {
+        if (msg.data.result < 100) {
+          session_id = msg.session_id;
+        } else {
+          show_toast("ユーザ登録に失敗しました");
         }
       }
       return 0;
@@ -71,7 +79,7 @@
       }
       msg = make_msg("register", {
         user_id: user_id,
-        passwd: passwd,
+        password: passwd,
         address: email,
         grade: school * 10 + grade
       });
