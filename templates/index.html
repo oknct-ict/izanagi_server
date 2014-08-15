@@ -11,6 +11,7 @@
   <script src="static/js/jquery.sha256.min.js"></script>
 	<script src="static/js/modernizr-2.6.2.min.js"></script>
 	<script src="static/js/bootstrap.js"></script>
+
 	<script src="static/js/codemirror.js"></script>
 	<script src="static/js/vb.js"></script>
 	<script src="static/js/main.js"></script>
@@ -18,6 +19,7 @@
 </head>
 <body>
 	<div class="win-ui-dark">
+    <!--
 		<a class="win-command win-command-small" id="btn-upload">
 			<span class="win-commandicon win-commandring icon-upload-3"></span>
 			<span class="win-label">Upload</span>
@@ -26,9 +28,14 @@
 			<span class="win-commandicon win-commandring icon-floppy"></span>
 			<span class="win-label">Save</span>
 		</a>
+    -->
     	<a href="#loginModal" class="win-command win-command-small" data-toggle="modal">
     		<span class="win-commandicon win-commandring icon-login"></span>
     		<span class="win-label">Login</span>
+    	</a>
+    	<a href="#registerModal" class="win-command win-command-small" data-toggle="modal">
+    		<span class="win-commandicon win-commandring icon-signup"></span>
+    		<span class="win-label">Register</span>
     	</a>
 	</div>
 
@@ -38,18 +45,59 @@
 			<h3>Login</h3>
 		</div>
 		<div class="modal-body">
-			<label for="user_id">UserID</label>
-			<input type="text" name="user_id" id="user_id">
-			<label for="passwd">Password</label>
-			<input type="password" name="passwd" id="passwd">
+			<label for="txt-login_user_id">UserID</label>
+			<input type="text" id="txt-login_user_id">
+			<label for="txt-login_passwd">Password</label>
+			<input type="password" id="txt-login_passwd">
 		</div>
 		<div class="modal-footer">
 			<a href="#" class="btn btn-primary" id="btn-login">Login</a>
+		</div>
+	</div>
+	
+	<div id="registerModal" class="modal hide fade">
+		<div class="modal-header">
+			<button class="close" type="button" data-dismiss="modal" aria-hidden="true"></button>
+			<h3>Register</h3>
+		</div>
+		<div class="modal-body">
+			<label for="txt-register_user_id">UserID</label>
+			<input type="text" id="txt-register_user_id">
+			<label for="txt-register_passwd">Password</label>
+			<input type="password" id="txt-register_passwd">
+			<label for="txt-register_passwd_confirm">Confirm Password</label>
+			<input type="password" id="txt-register_passwd_confirm">
+			<label for="txt-register_email">Email</label>
+			<input type="email" id="txt-register_email" required>
+			<div>
+				<select id="select-register_school">
+					<option value="1">小学校</option>
+					<option value="2">中学校</option>
+					<option value="3">高校</option>
+					<option value="4">大学</option>
+					<option value="5">大学院</option>
+					<option value="6">高専</option>
+					<option value="7">専門学校</option>
+					<option value="8">その他</option>
+				</select>
+				<select id="select-register_grade">
+					<option value="1">1年生</option>
+					<option value="2">2年生</option>
+					<option value="3">3年生</option>
+					<option value="4">4年生</option>
+					<option value="5">5年生</option>
+					<option value="6">6年生</option>
+				</select>
+			</div>
+		</div>
+		<div class="modal-footer">
+			<a href="#" class="btn btn-primary" id="btn-register">Register</a>
 		</div>
 	</div>
 
 	<div class="editor-space">
 		<textarea id="editor"></textarea>
 	</div>
+	<div id="alerts-container" style="position: fixed; bottom: 5px; right: 5px; padding: 0; z-index: 1100;"></div>
 </body>
 </html>
