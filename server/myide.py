@@ -8,16 +8,29 @@ from connection_manager import CONNECTION_MANAGER
 
 USER = "user_id"
 PASS = "password"
+MAIL = "address"
+GRADE = "grade"
 RES = "result"
 
 def receive_ide(websock, session_id, command, data):
+    # user register
+    if command == myconst.REGISTER_REQ:
+        command = myconst.REGISTER_RES;
+        session_id, res = receive_ide_register(websock, data[USER], data[PASS], data[MAIL], data[GRADE]);
+        data = {RES:res}
     # login
-    if command == myconst.LOGIN_REQ:
+    elif command == myconst.LOGIN_REQ:
         command = myconst.LOGIN_RES;
-        session_id, res = receive_ide_login(websock, data[USER], data[PASS]);
-        data = {RES:res};
+        session_id, data = receive_ide_login(websock, data[USER], data[PASS]);
+        data = {RES:res}
+    # session_id whether correct websock?
+    else:
+        if CONNECTION_MANAGER.is_valid_websocket(myconst.IDE, session_id, websocket) is False:
+            # not correct 
+            return (None, None, None);
+        
     # save
-    elif command == myconst.SAVE_REQ:
+    if command == myconst.SAVE_REQ:
         receive_ide_save();
     # renew
     elif command == myconst.RENEW_REQ:
@@ -32,9 +45,17 @@ def receive_ide(websock, session_id, command, data):
     print session_id, command, data;
     return (session_id, command, data);
 
+def receive_ide_register(websock, user_id, password, address, grade):
+    # check is user_id unique
+    if user_manager.check_unique_user_id(user_id) is False:
+        return ("", myconst.USER_EXISTING);
+    user_manager.append(user_id, password, address, grade);
+    session_id = CONNECTION_MANAGER.append(myconst.IDE, websock, user_id);
+    return (session_id, myconst.OK);
+
 def receive_ide_login(websock, user_id, password):
     # userdata check
-    if user_manager.check_db(user_id, password) is False:
+    if user_manager.is_valid_user_id(user_id, password) is False:
         # no user data 
         return ("", myconst.USER_DATA_FAULT);
     # access_point num check
