@@ -30,11 +30,15 @@ def websock_ide():
             if not data:
                 break;
             json_data = json.loads(data);
+            print json_data
             session_id, command, data = get_json(json_data);
+            # if not first time login
             if command == myconst.LOGIN_REQ and session_id != "":
+                # disconnect
                 CONNECTION_MANAGER.delete(myconst.IDE, session_id);
             session_id, command, data = myide.receive_ide(websock, session_id, command, data);
             mycommand.send_ide(websock, session_id, command, data);
+    # sessin_id exist => disconnect
     if session_id is not "":
         CONNECTION_MANAGER.delete(myconst.IDE, session_id);
     return "Disconnect";

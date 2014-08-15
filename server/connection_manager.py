@@ -63,9 +63,7 @@ class _ConnectionManager(object):
 
     @connection_types.validater(1)
     def is_connectioned_user(self, connection_type, user_id):
-        lists = self._connections[connection_type].values();
-        for l in lists:
-            if user_id in l[USER]:
+        if user_id in self._connection_count[connection_type]:
                 return True;
         return False;
         
@@ -79,6 +77,13 @@ class _ConnectionManager(object):
         print "session_id is not exist";
         return None;
         
+    @connection_types.validater(1)
+    def is_valid_websocket(self, connection_type, session_id, websock):
+        get_ws = self.get_connections(connection_type, session_id);
+        if websock == get_ws:
+            return True;
+        return False;
+
 CONNECTION_MANAGER = _ConnectionManager()
 
 if __name__ == "__main__":
