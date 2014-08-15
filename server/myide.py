@@ -21,7 +21,7 @@ def receive_ide(websock, session_id, command, data):
     # login
     elif command == myconst.LOGIN_REQ:
         command = myconst.LOGIN_RES;
-        session_id, data = receive_ide_login(websock, data[USER], data[PASS]);
+        session_id, res = receive_ide_login(websock, data[USER], data[PASS]);
         data = {RES:res}
     # session_id whether correct websock?
     else:

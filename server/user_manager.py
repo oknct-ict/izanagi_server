@@ -24,7 +24,7 @@ def check_unique_user_id(user_id):
     # user_id is already register
     return False;
     
-def is_valis_user_id(user_id, password):
+def is_valid_user_id(user_id, password):
     pass_sha256 = mycommand.get_sha256(password);
     if g.db.users.find_one({USER:user_id, PASS:pass_sha256}) is None:
         print user_id, password, pass_sha256,  "no_user"
