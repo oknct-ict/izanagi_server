@@ -5,6 +5,7 @@ import mycommand
 import myconst
 import user_manager
 import project_manager
+import check_input
 from connection_manager import CONNECTION_MANAGER
 
 USER = "user_id"
@@ -20,7 +21,11 @@ def receive_ide(websock, session_id, command, data):
     # user register
     if command == myconst.REGISTER_REQ:
         command = myconst.REGISTER_RES;
-        session_id, res = receive_ide_register(websock, data[USER], data[PASS], data[MAIL], data[GRADE]);
+        user, password, mail, grade, res = check_input.register(data);
+        if res == myconst.OK:
+            print myconst.OK;
+            session_id, res = receive_ide_register(websock, user, password, mail, grade);
+        #session_id, res = receive_ide_register(websock, data[USER], data[PASS], data[MAIL], data[GRADE]);
         data = {RES:res}
     # login
     elif command == myconst.LOGIN_REQ:
