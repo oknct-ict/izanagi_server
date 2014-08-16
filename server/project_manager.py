@@ -33,6 +33,10 @@ def delete(project_id):
     g.db.projects.remove({PRO_ID:project_id});
     return;
 
+def rename(project_id, project_name):
+    g.db.projects.update({PRO_ID:project_id}, {"$set":{PRO_NAME:project_name}});
+    return;
+
 def get_lists(user_id):
     lists = g.db.projects.find({USER:user_id});
     project_list = {};
