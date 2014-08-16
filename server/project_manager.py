@@ -4,6 +4,7 @@
 from flask import g
 import pymongo
 import mycommand
+import myconst
 
 PRO_ID = "project_id"
 PRO_NAME = "project_name"
@@ -23,11 +24,20 @@ def check_unique_project_name(user_id, project_name):
     return False;
 
 def is_valid_project_id(user_id, project_id):
-    if g.db.users.find_one({PRO_ID:project_id, USER:user_id}) is None:
+    if g.db.projects.find_one({PRO_ID:project_id, USER:user_id}) is None:
         print "project is none";
         return False;
     return True;
 
 def delete(user_id, project_id):
     return;
+
+def get_lists(user_id):
+    lists = g.db.projects.find({USER:user_id});
+    project_list = {};
+    if lists is not None:
+        for value in lists:
+            project_list.update({value["project_id"]:value["project_name"]});
+    print project_list.values();
+    return (project_list, myconst.OK);
 

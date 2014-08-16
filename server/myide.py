@@ -14,6 +14,7 @@ GRADE = "grade"
 RES = "result"
 PRO_ID = "project_id"
 PRO_NAME = "project_name"
+PRO_LIST = "project_list"
 
 def receive_ide(websock, session_id, command, data):
     # user register
@@ -30,13 +31,20 @@ def receive_ide(websock, session_id, command, data):
     else:
         if CONNECTION_MANAGER.is_valid_websocket(myconst.IDE, session_id, websock) is False:
             # not correct 
-            return (None, None, None);
-       
+            return (None, None, None);   
+    # get user_id from session_id
+    user_id = CONNECTION_MANAGER.get_user_id(myconst.IDE, session_id);
+    
     # project_create
     if command == myconst.PRO_CREATE_REQ:
         command = myconst.PRO_CREATE_RES;
-        project_id, res = receive_ide_pro_create(session_id, data["project_name"]);
+        project_id, res = receive_ide_pro_create(user_id, data[PRO_NAME]);
         data = {PRO_ID:project_id, RES:res};
+    # project_list
+    elif command == myconst.PRO_LIST_REQ:
+        command = myconst.PRO_LIST_RES;
+        project_lists, res = receive_ide_pro_list(user_id);
+        data = {PRO_LIST:project_lists, RES:res};
     # file_save
     elif command == myconst.SAVE_REQ:
         receive_ide_save();
@@ -74,8 +82,7 @@ def receive_ide_login(websock, user_id, password):
     session_id = CONNECTION_MANAGER.append(myconst.IDE, websock, user_id);
     return (session_id, myconst.OK);
 
-def receive_ide_pro_create(session_id, project_name):
-    user_id = CONNECTION_MANAGER.get_user_id(myconst.IDE, session_id);
+def receive_ide_pro_create(user_id, project_name):
     # check is project_name unique
     if project_manager.check_unique_project_name(user_id, project_name) is False:
         return ("", myconst.PROJECT_EXISTING);
@@ -83,6 +90,10 @@ def receive_ide_pro_create(session_id, project_name):
     project_id = project_manager.create(user_id, project_name);
     return (project_id, myconst.OK);
     
+def receive_ide_pro_list(user_id):
+    project_list, res = project_manager.get_lists(user_id);   
+    return (project_list, res);
+
 def receive_ide_save():
     return;
 
