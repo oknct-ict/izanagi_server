@@ -4,6 +4,7 @@
 import mycommand
 import myconst
 import user_manager
+import project_manager
 from connection_manager import CONNECTION_MANAGER
 
 USER = "user_id"
@@ -11,6 +12,8 @@ PASS = "password"
 MAIL = "address"
 GRADE = "grade"
 RES = "result"
+PRO_ID = "project_id"
+PRO_NAME = "project_name"
 
 def receive_ide(websock, session_id, command, data):
     # user register
@@ -25,12 +28,17 @@ def receive_ide(websock, session_id, command, data):
         data = {RES:res}
     # session_id whether correct websock?
     else:
-        if CONNECTION_MANAGER.is_valid_websocket(myconst.IDE, session_id, websocket) is False:
+        if CONNECTION_MANAGER.is_valid_websocket(myconst.IDE, session_id, websock) is False:
             # not correct 
             return (None, None, None);
-        
-    # save
-    if command == myconst.SAVE_REQ:
+       
+    # project_create
+    if command == myconst.PRO_CREATE_REQ:
+        command = myconst.PRO_CREATE_RES;
+        project_id, res = receive_ide_pro_create(session_id, data["project_name"]);
+        data = {PRO_ID:project_id, RES:res};
+    # file_save
+    elif command == myconst.SAVE_REQ:
         receive_ide_save();
     # renew
     elif command == myconst.RENEW_REQ:
@@ -66,6 +74,15 @@ def receive_ide_login(websock, user_id, password):
     session_id = CONNECTION_MANAGER.append(myconst.IDE, websock, user_id);
     return (session_id, myconst.OK);
 
+def receive_ide_pro_create(session_id, project_name):
+    user_id = CONNECTION_MANAGER.get_user_id(myconst.IDE, session_id);
+    # check is project_name unique
+    if project_manager.check_unique_project_name(user_id, project_name) is False:
+        return ("", myconst.PROJECT_EXISTING);
+    # project create
+    project_id = project_manager.create(user_id, project_name);
+    return (project_id, myconst.OK);
+    
 def receive_ide_save():
     return;
 
