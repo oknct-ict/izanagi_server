@@ -78,8 +78,18 @@ class _ConnectionManager(object):
         return None;
         
     @connection_types.validater(1)
+    def get_user_id(self, connection_type, session_id):
+        keys = self._connections[connection_type].keys()
+        for key in keys:
+            if session_id == key:
+                print "get connection is ok.", self._connections[connection_type][key][USER];
+                return self._connections[connection_type][key][USER];
+        print "session_id is not exist";
+        return None;
+
+    @connection_types.validater(1)
     def is_valid_websocket(self, connection_type, session_id, websock):
-        get_ws = self.get_connections(connection_type, session_id);
+        get_ws = self.get_connection(connection_type, session_id);
         if websock == get_ws:
             return True;
         return False;
