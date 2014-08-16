@@ -32,11 +32,15 @@ def receive_ide(websock, session_id, command, data):
             # not correct 
             return (None, None, None);
        
+    # get user_id from session_id
+    user_id = CONNECTION_MANAGER.get_user_id(myconst.IDE, session_id);
     # project_create
     if command == myconst.PRO_CREATE_REQ:
         command = myconst.PRO_CREATE_RES;
-        project_id, res = receive_ide_pro_create(session_id, data["project_name"]);
+        project_id, res = receive_ide_pro_create(session_id, user_id, data["project_name"]);
         data = {PRO_ID:project_id, RES:res};
+    if command == myconst.PRO_LIST_REQ:
+        command = myconst.PRO_LIST_RES;
     # file_save
     elif command == myconst.SAVE_REQ:
         receive_ide_save();
@@ -74,8 +78,7 @@ def receive_ide_login(websock, user_id, password):
     session_id = CONNECTION_MANAGER.append(myconst.IDE, websock, user_id);
     return (session_id, myconst.OK);
 
-def receive_ide_pro_create(session_id, project_name):
-    user_id = CONNECTION_MANAGER.get_user_id(myconst.IDE, session_id);
+def receive_ide_pro_create(session_id, user_id, project_name):
     # check is project_name unique
     if project_manager.check_unique_project_name(user_id, project_name) is False:
         return ("", myconst.PROJECT_EXISTING);
