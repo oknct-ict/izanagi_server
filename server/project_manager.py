@@ -23,13 +23,14 @@ def check_unique_project_name(user_id, project_name):
     # project_name is already created
     return False;
 
-def is_valid_project_id(user_id, project_id):
-    if g.db.projects.find_one({PRO_ID:project_id, USER:user_id}) is None:
+def is_valid_project_id(project_id):
+    if g.db.projects.find_one({PRO_ID:project_id}) is None:
         print "project is none";
         return False;
     return True;
 
-def delete(user_id, project_id):
+def delete(project_id):
+    g.db.projects.remove({PRO_ID:project_id});
     return;
 
 def get_lists(user_id):
