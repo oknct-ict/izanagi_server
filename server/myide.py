@@ -45,6 +45,11 @@ def receive_ide(websock, session_id, command, data):
         command = myconst.PRO_LIST_RES;
         project_lists, res = receive_ide_pro_list(user_id);
         data = {PRO_LIST:project_lists, RES:res};
+    # project_delete
+    elif command == myconst.PRO_DELETE_REQ:
+        command = myconst.PRO_DELETE_RES;
+        res = receive_ide_pro_delete(data[PRO_ID]);
+        data = {RES:res};
     # file_save
     elif command == myconst.SAVE_REQ:
         receive_ide_save();
@@ -90,6 +95,13 @@ def receive_ide_pro_create(user_id, project_name):
     project_id = project_manager.create(user_id, project_name);
     return (project_id, myconst.OK);
     
+def receive_ide_pro_delete(project_id):
+    # check is project_id
+    if project_manager.is_valid_project_id(project_id) is False:
+        return (myconst.PROJECT_NO_EXISTING);
+    project_manager.delete(project_id);
+    return (myconst.OK);
+
 def receive_ide_pro_list(user_id):
     project_list, res = project_manager.get_lists(user_id);   
     return (project_list, res);
