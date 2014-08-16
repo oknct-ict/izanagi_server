@@ -6,7 +6,7 @@ OK = 0
 
 # command_REQ
 REGISTER_REQ        = "register_REQ"
-PRO_SAVE_REQ        = "pro_save_REQ"
+PRO_CREATE_REQ      = "pro_create_REQ"
 PRO_RENAME_REQ      = "pro_rename_REQ"
 PRO_DELETE_REQ      = "pro_delete_REQ"
 PRO_LIST_REQ        = "pro_list_REQ"
@@ -18,7 +18,7 @@ DELETE_REQ          = "delete_REQ"
 
 # command_RES
 REGISTER_RES        = "register_RES"
-PRO_SAVE_RES        = "pro_save_RES"
+PRO_CREATE_RES      = "pro_create_RES"
 PRO_RENAME_RES      = "pro_rename_RES"
 PRO_DELETE_RES      = "pro_delete_RES"
 PRO_LIST_RES        = "pro_list_RES"
