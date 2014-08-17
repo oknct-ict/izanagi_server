@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+#coding:utf-8
+
 import os
 from geventwebsocket.handler import WebSocketHandler
 from gevent.pywsgi import WSGIServer
@@ -20,6 +23,9 @@ def index():
 def test():
     return render_template("test.html");
 
+'''
+IDEの通信の受け口
+'''
 @app.route('/websock/ide/')
 def websock_ide():
     session_id = "";
@@ -43,6 +49,9 @@ def websock_ide():
         CONNECTION_MANAGER.delete(myconst.IDE, session_id);
     return "Disconnect";
 
+'''
+Androidの通信の受け口
+'''
 @app.route('/websock/android/')
 def websock_android():
     websock = None;
@@ -57,6 +66,13 @@ def websock_android():
         CONNECTION_MANAGER.remove(myconst.ANDROID, websock);
     return "Disconnect";
 
+'''
+辞書型のJSONを１つ１つの変数に分ける
+@param json_data ユーザーから入力されるJSONデータをDictonaryにしたもの
+@return session_id
+@return command
+@return data
+'''
 def get_json(json_data):
     session_id = json_data["session_id"];
     command = json_data["command"];
