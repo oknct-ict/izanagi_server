@@ -1,13 +1,10 @@
 #!/usr/bin/env python
 #coding:utf-8
 
-from geventwebsocket.handler import WebSocketHandler
-from gevent.pywsgi import WSGIServer
 import myconst
 import json
 import random
 import hashlib
-from connection_manager import CONNECTION_MANAGER
     
 def send_ide(websock, session_id, command, data):
     json_data = make_json(myconst.IDE, session_id, command, data);

@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 #coding:utf-8
 
-import mycommand
 import myconst
 import user_manager
 import project_manager
