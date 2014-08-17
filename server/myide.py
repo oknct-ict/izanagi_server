@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 #coding:utf-8
 
-import mycommand
 import myconst
 import user_manager
 import project_manager
@@ -49,6 +48,11 @@ def receive_ide(websock, session_id, command, data):
     elif command == myconst.PRO_DELETE_REQ:
         command = myconst.PRO_DELETE_RES;
         res = receive_ide_pro_delete(data[PRO_ID]);
+        data = {RES:res};
+    # project_rename
+    elif command == myconst.PRO_RENAME_REQ:
+        command = myconst.PRO_RENAME_RES;
+        res = receive_ide_pro_rename(data[PRO_ID], data[PRO_NAME]);
         data = {RES:res};
     # file_save
     elif command == myconst.SAVE_REQ:
@@ -100,6 +104,13 @@ def receive_ide_pro_delete(project_id):
     if project_manager.is_valid_project_id(project_id) is False:
         return (myconst.PROJECT_NO_EXISTING);
     project_manager.delete(project_id);
+    return (myconst.OK);
+
+def receive_ide_pro_rename(project_id, project_name):
+    # check is project_id
+    if project_manager.is_valid_project_id(project_id) is False:
+        return (myconst.PROJECT_NO_EXISTING);
+    project_manager.rename(project_id, project_name);
     return (myconst.OK);
 
 def receive_ide_pro_list(user_id):

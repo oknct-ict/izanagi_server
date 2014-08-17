@@ -1,4 +1,3 @@
-import mycommand
 import myconst
 
 def receive_android(websock, command, message):
