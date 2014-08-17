@@ -8,10 +8,8 @@
 	<link rel="stylesheet" href="static/css/bootmetro-ui-light.css">
 	<link rel="stylesheet" href="static/css/main.css">
 	<script src="//code.jquery.com/jquery-1.10.0.min.js"></script>
-  <script src="static/js/jquery.sha256.min.js"></script>
 	<script src="static/js/modernizr-2.6.2.min.js"></script>
 	<script src="static/js/bootstrap.js"></script>
-
 	<script src="static/js/codemirror.js"></script>
 	<script src="static/js/vb.js"></script>
 	<script src="static/js/main.js"></script>
@@ -29,13 +27,17 @@
 			<span class="win-label">Save</span>
 		</a>
     -->
+    	<a href="#registerModal" class="win-command win-command-small" data-toggle="modal">
+    		<span class="win-commandicon win-commandring icon-signup"></span>
+    		<span class="win-label">Register</span>
+    	</a>
     	<a href="#loginModal" class="win-command win-command-small" data-toggle="modal">
     		<span class="win-commandicon win-commandring icon-login"></span>
     		<span class="win-label">Login</span>
     	</a>
-    	<a href="#registerModal" class="win-command win-command-small" data-toggle="modal">
-    		<span class="win-commandicon win-commandring icon-signup"></span>
-    		<span class="win-label">Register</span>
+    	<a href="#projectModal" class="win-command win-command-small" data-toggle="modal">
+    		<span class="win-commandicon win-commandring icon-list-4"></span>
+    		<span class="win-label">Projects</span>
     	</a>
 	</div>
 
@@ -92,6 +94,15 @@
 		</div>
 		<div class="modal-footer">
 			<a href="#" class="btn btn-primary" id="btn-register">Register</a>
+		</div>
+	</div>
+	<div id="projectModal" class="modal hide fade">
+		<div class="modal-header">
+			<button class="close" type="button" data-dismiss="modal" aria-hidden="true"></button>
+			<h3>Projects</h3>
+		</div>
+		<div class="modal-body">
+			
 		</div>
 	</div>
 

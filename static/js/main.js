@@ -1,6 +1,6 @@
 (function() {
   $(function() {
-    var editor, make_msg, send, session_id, show_toast, ws;
+    var editor, event_handlers, make_msg, send, session_id, show_toast, ws;
     editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
       lineNumbers: true,
       mode: "text/x-vb",
@@ -8,10 +8,7 @@
     });
     ws = new WebSocket("ws://nado.oknctict.tk:5000/websock/ide/");
     session_id = null;
-    send = function(msg) {
-      console.log(msg);
-      return ws.send(msg);
-    };
+    event_handlers = {};
     make_msg = function(command, data) {
       var sid;
       if (session_id === null) {
@@ -26,49 +23,70 @@
         data: data
       });
     };
+    send = function(command, data, timeout) {
+      var deferred, msg, timer_id;
+      data || (data = {});
+      timeout || (timeout = 5000);
+      msg = make_msg(command, data);
+      deferred = $.Deferred();
+      timer_id = setTimeout(function() {
+        return deferred.reject();
+      }, timeout);
+      event_handlers[command + "_RES"] = function(m) {
+        deferred.resolve(m);
+        return clearTimeout(timer_id);
+      };
+      ws.send(msg);
+      console.log("Send:");
+      console.log(msg);
+      return deferred.promise();
+    };
     show_toast = function(text) {
       var toast;
       toast = $('<div class="toast fade"><button type="button" class="close" data-dismiss="alert"></button><div class="toast-body"><p>' + text + '</p></div>');
       return $("#alerts-container").append(toast.addClass("in"));
     };
     ws.onerror = function(error) {
-      return show_toast("ページを読み込みなおしてください");
+      return show_toast("please reload this web page");
     };
     ws.onmessage = function(event) {
       var msg;
       msg = JSON.parse(event.data);
+      console.log("Receive:");
       console.log(msg);
-      if (msg.command === "login_RES") {
+      if (msg.command in event_handlers) {
+        event_handlers[msg.command](msg);
+      }
+      return 0;
+    };
+    $("#projectModal").on("shown", function() {
+      return send("pro_list", {}).then(function(msg) {
+        return show_toast("pro_list passive");
+      }, function() {});
+    });
+    $("#btn-login").click(function() {
+      var passwd, user_id;
+      user_id = $("#txt-login_user_id").val();
+      passwd = $("#txt-login_passwd").val();
+      return send("login", {
+        user_id: user_id,
+        password: passwd
+      }).then(function(msg) {
         if (msg.data.result < 100) {
           session_id = msg.session_id;
           $("#loginModal").modal("hide");
         } else {
           session_id = null;
-          show_toast("ログインに失敗しました");
+          show_toast("login failed");
         }
-      }
-      if (msg.command === "register_RES") {
-        if (msg.data.result < 100) {
-          session_id = msg.session_id;
-          $("#registerModal").modal("hide");
-        } else {
-          show_toast("ユーザ登録に失敗しました");
-        }
-      }
-      return 0;
-    };
-    $("#btn-login").click(function() {
-      var msg, passwd, user_id;
-      user_id = $("#txt-login_user_id").val();
-      passwd = $("#txt-login_passwd").val();
-      msg = make_msg("login", {
-        user_id: user_id,
-        password: passwd
+        return 0;
+      }, function() {
+        session_id = null;
+        return show_toast("login timeout");
       });
-      return send(msg);
     });
     return $("#btn-register").click(function() {
-      var email, grade, msg, passwd, passwd_confirm, school, user_id;
+      var email, grade, passwd, passwd_confirm, school, user_id;
       user_id = $("#txt-register_user_id").val();
       passwd = $("#txt-register_passwd").val();
       passwd_confirm = $("#txt-register_passwd_confirm").val();
@@ -76,15 +94,24 @@
       school = parseInt($("#select-register_school").val());
       grade = parseInt($("#select-register_grade").val());
       if (passwd !== passwd_confirm) {
+        show_toast("password incorrect");
         return 0;
       }
-      msg = make_msg("register", {
+      return send("register", {
         user_id: user_id,
         password: passwd,
         address: email,
         grade: school * 10 + grade
+      }).then(function(msg) {
+        if (msg.data.result < 100) {
+          session_id = msg.session_id;
+          return $("#registerModal").modal("hide");
+        } else {
+          return show_toast("registration failed");
+        }
+      }, function() {
+        return show_toast("registration timeout");
       });
-      return send(msg);
     });
   });
 

@@ -6,13 +6,12 @@ $(() ->
       matchBrackets: true,
     }
   )
-
+  
   ws = new WebSocket("ws://nado.oknctict.tk:5000/websock/ide/")
   session_id = null
+  event_handlers = {}
 
-  send = (msg) ->
-    console.log msg
-    ws.send(msg)
+
 
   make_msg = (command, data) ->
     if session_id == null
@@ -27,39 +26,70 @@ $(() ->
       data: data
     })
 
+  send = (command, data, timeout) ->
+    data ||= {}
+    timeout ||= 5000
+
+    msg = make_msg(command, data)
+    deferred = $.Deferred()
+    
+    timer_id = setTimeout(() ->
+      deferred.reject()
+    , timeout)
+
+    event_handlers[command + "_RES"] = (m) ->
+      deferred.resolve(m)
+      clearTimeout timer_id
+
+    ws.send(msg)
+    console.log "Send:"
+    console.log msg
+    return deferred.promise()
+
   show_toast = (text) ->
     toast = $('<div class="toast fade"><button type="button" class="close" data-dismiss="alert"></button><div class="toast-body"><p>' + text + '</p></div>')
     $("#alerts-container").append(toast.addClass("in"))
     
   ws.onerror = (error) ->
-    show_toast "ページを読み込みなおしてください"
+    show_toast "please reload this web page"
 
   ws.onmessage = (event) ->
     msg = JSON.parse(event.data)
+    console.log "Receive:"
     console.log msg
-    if msg.command == "login_RES"
-      if msg.data.result < 100
-        session_id = msg.session_id
-        $("#loginModal").modal("hide")
-      else
-        session_id = null
-        show_toast "ログインに失敗しました"
-    if msg.command == "register_RES"
-      if msg.data.result < 100
-        session_id = msg.session_id
-        $("#registerModal").modal("hide")
-      else
-        show_toast "ユーザ登録に失敗しました"
+    if msg.command of event_handlers
+      event_handlers[msg.command](msg)
     0
+
+  $("#projectModal").on("shown", () ->
+    send("pro_list", {}).then(
+      (msg) ->
+        # succuses
+        show_toast "pro_list passive"
+      , () ->
+        # fail
+    )
+  )
 
   $("#btn-login").click(() ->
     user_id = $("#txt-login_user_id").val()
     passwd = $("#txt-login_passwd").val()
-    msg = make_msg("login", {
+    send("login", {
       user_id: user_id,
       password: passwd
-    })
-    send(msg)
+    }).then(
+      (msg) ->
+        if msg.data.result < 100
+          session_id = msg.session_id
+          $("#loginModal").modal("hide")
+        else
+          session_id = null
+          show_toast "login failed"
+        0
+      , () ->
+        session_id = null
+        show_toast "login timeout"
+    )
   )
 
   $("#btn-register").click(() ->
@@ -71,15 +101,24 @@ $(() ->
     grade = parseInt $("#select-register_grade").val()
 
     if passwd != passwd_confirm
+      show_toast "password incorrect"
       return 0
 
-    msg = make_msg("register", {
+    send("register", {
       user_id: user_id,
       password: passwd,
       address: email,
       grade: school * 10 + grade,
-    })
-    send(msg)
+    }).then(
+      (msg) ->
+        if msg.data.result < 100
+          session_id = msg.session_id
+          $("#registerModal").modal("hide")
+        else
+          show_toast "registration failed"
+      , () ->
+        show_toast "registration timeout"
+    )
   )
 )
 
