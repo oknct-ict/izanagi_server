@@ -6,119 +6,188 @@ $(() ->
       matchBrackets: true,
     }
   )
-  
-  ws = new WebSocket("ws://nado.oknctict.tk:5000/websock/ide/")
-  session_id = null
-  event_handlers = {}
-
-
-
-  make_msg = (command, data) ->
-    if session_id == null
-      sid = ""
-    else
-      sid = session_id
-
-    return JSON.stringify({
-      type: "ide",
-      session_id: sid,
-      command: command + "_REQ",
-      data: data
-    })
-
-  send = (command, data, timeout) ->
-    data ||= {}
-    timeout ||= 5000
-
-    msg = make_msg(command, data)
-    deferred = $.Deferred()
-    
-    timer_id = setTimeout(() ->
-      deferred.reject()
-    , timeout)
-
-    event_handlers[command + "_RES"] = (m) ->
-      deferred.resolve(m)
-      clearTimeout timer_id
-
-    ws.send(msg)
-    console.log "Send:"
-    console.log msg
-    return deferred.promise()
-
-  show_toast = (text) ->
+  showToast = (text) ->
     toast = $('<div class="toast fade"><button type="button" class="close" data-dismiss="alert"></button><div class="toast-body"><p>' + text + '</p></div>')
     $("#alerts-container").append(toast.addClass("in"))
+
+  class User
+    constructor: (userId = null, sessionId = null) ->
+      @_userId = userId
+      @_sessionId = sessionId
+    setUser: (userId, sessionId) ->
+      if userId == null
+        if @_userId != null
+          @onLogout @_userId, @_sessionId
+        @_userId = userId
+        @_sessionId = sessionId
+      else if userId != @_userId
+        if @_userId != null
+          @onLogout @_userId, @_sessionId
+        @onLogin userId, sessionId
+        @_userId = userId
+        @_sessionId = sessionId
+      else
+        @_sessionId = sessionId
+    onLogout: () ->
+      0
+    onLogin: () ->
+      0
+
+  class IzanagiWebSocket
+    @SERVER_URL = "ws://nado.oknctict.tk:5000/websock/ide/"
     
-  ws.onerror = (error) ->
-    show_toast "please reload this web page"
+    constructor: (receiver, error) ->
+      receiver ||= () -> 0
+      error ||= () -> 0
+      @_websocket = new WebSocket(IzanagiWebSocket.SERVER_URL)
+      @_websocket.onerror = error
+      @_websocket.onmessage = (event) ->
+        receiver JSON.parse(event.data)
+    sendJSON: (data) ->
+      @_websocket.send JSON.stringify(data)
 
-  ws.onmessage = (event) ->
-    msg = JSON.parse(event.data)
-    console.log "Receive:"
-    console.log msg
-    if msg.command of event_handlers
-      event_handlers[msg.command](msg)
-    0
+  class IzanagiConnection
+    @CONNECTION_TYPE = "ide"
+    @DEFAULT_TIMEOUT = 5000
+    @ERROR_TIMEOUT = -1
 
-  $("#projectModal").on("shown", () ->
-    send("pro_list", {}).then(
-      (msg) ->
-        # succuses
-        show_toast "pro_list passive"
-      , () ->
-        # fail
-    )
-  )
-
-  $("#btn-login").click(() ->
-    user_id = $("#txt-login_user_id").val()
-    passwd = $("#txt-login_passwd").val()
-    send("login", {
-      user_id: user_id,
-      password: passwd
-    }).then(
-      (msg) ->
-        if msg.data.result < 100
-          session_id = msg.session_id
-          $("#loginModal").modal("hide")
+    constructor: () ->
+      @_user = new User()
+      @_eventHandlers = {}
+      @_izanagiWebSocket = new IzanagiWebSocket(
+        (msg) =>
+          if msg.command of @_eventHandlers
+            @_eventHandlers[msg.command](msg)
+            delete @_eventHandlers[msg.command]
+          0
+        , () ->
+          showToast "please reload this web page"
+      )
+      @_validResponse = (msg) ->
+        msg.data.result < 100
+      @_makePacket = (command, data) ->
+        if @_user._sessionId == null
+          sid = ""
         else
-          session_id = null
-          show_toast "login failed"
-        0
-      , () ->
-        session_id = null
-        show_toast "login timeout"
+          sid = @_user._sessionId
+        {type: IzanagiConnection.CONNECTION_TYPE, session_id: sid, command: command + "_REQ", data: data}
+      @_sendCommand = (command, data = {}, timeout = IzanagiConnection.DEFAULT_TIMEOUT) ->
+        deferred = $.Deferred()
+        timerId = setTimeout(() ->
+          deferred.reject(IzanagiConnection.ERROR_TIMEOUT)
+        , timeout)
+        @_eventHandlers[command + "_RES"] = (m) =>
+          if @_validResponse m
+            deferred.resolve m
+          else
+            deferred.reject m.data.result
+          clearTimeout timerId
+        @_izanagiWebSocket.sendJSON @_makePacket(command, data)
+        deferred.promise()
+      0
+    login: (userId, password) ->
+      @_sendCommand("login", {
+        user_id: userId,
+        password: password,
+      }).done((msg) =>
+        @_user.setUser userId, msg.session_id
+      ).fail((error) =>
+        @_user.setUser null, null
+      )
+    register: (userId, password, email, grade) ->
+      @_sendCommand("register", {
+        user_id: userId,
+        password: password,
+        address: email,
+        grade: grade,
+      }).done((msg) =>
+        @_user.setUser userId, msg.session_id
+      ).fail((error) =>
+        @_user.setUser null, null
+      )
+    getProjects: () ->
+      @_sendCommand("pro_list", {
+      })
+    createProject: (projectName) ->
+      @_sendCommand("pro_create", {
+        project_name: projectName
+      })
+    renameProject: (projectId, projectName) ->
+      @_sendCommand("pro_rename", {
+        project_id: projectId,
+        project_name: projectName
+      })
+    deleteProject: (projectId) ->
+      @_sendCommand("pro_delete", {
+        project_id: projectId
+      })
+    saveFile: (projectId, dirName, fileName, code) ->
+      @_sendCommand("save", {
+        file_name: fileName,
+        project_id: projectId,
+        dir: dirName,
+        code: code
+      })
+    updateFile: (fileId, code) ->
+      @_sendCommand("renew", {
+        file_id: fileId,
+        code: code
+      })
+    openFile: (fileId) ->
+      @_sendCommand("open", {
+        file_id: fileId
+      })
+    deleteFile: (fileId) ->
+      @_sendCommand("delete", {
+        file_id: fileId
+      })
+    setOnLogin: (handler) ->
+      @_user.onLogin = handler
+    setOnLogout: (handler) ->
+      @_user.onLogout = handler
+
+  con = new IzanagiConnection()
+  con.setOnLogin (userId, sessionId) ->
+    showToast "Welcome " + userId
+    $("#icon-btn_register").addClass("disable")
+    $("#icon-btn_login").addClass("disable")
+    $("#icon-btn_project").removeClass("disable")
+
+  con.setOnLogout (userId, sessionId) ->
+    showToast "Bye " + userId
+    $("#icon-btn_register").removeClass("disable")
+    $("#icon-btn_login").removeClass("disable")
+    $("#icon-btn-project").addClass("disable")
+
+  $("#projectModal").on "shown", () ->
+    con.getProjects().done(() ->
+    )
+  $("#btn-login").click(() ->
+    userId = $("#txt-login_user_id").val()
+    password = $("#txt-login_passwd").val()
+    con.login(userId, password).done(() ->
+      $("#loginModal").modal "hide"
+    ).fail(() ->
+      showToast "login failed"
     )
   )
 
   $("#btn-register").click(() ->
-    user_id = $("#txt-register_user_id").val()
-    passwd = $("#txt-register_passwd").val()
-    passwd_confirm = $("#txt-register_passwd_confirm").val()
+    userId = $("#txt-register_user_id").val()
+    password = $("#txt-register_passwd").val()
+    passwordConfirm = $("#txt-register_passwd_confirm").val()
     email = $("#txt-register_email").val()
     school = parseInt $("#select-register_school").val()
     grade = parseInt $("#select-register_grade").val()
 
-    if passwd != passwd_confirm
-      show_toast "password incorrect"
+    if password != passwordConfirm
+      showToast "password incorrect"
       return 0
 
-    send("register", {
-      user_id: user_id,
-      password: passwd,
-      address: email,
-      grade: school * 10 + grade,
-    }).then(
-      (msg) ->
-        if msg.data.result < 100
-          session_id = msg.session_id
-          $("#registerModal").modal("hide")
-        else
-          show_toast "registration failed"
-      , () ->
-        show_toast "registration timeout"
+    con.register(userId, password, email, school * 10 + grade).done(() ->
+      $("#registerModal").modal "hide"
+    ).fail(() ->
+      showToast "registration failed"
     )
   )
 )
-
