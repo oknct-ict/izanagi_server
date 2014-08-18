@@ -32,6 +32,10 @@ $(() ->
       0
     onLogin: () ->
       0
+  class Project
+    constructor: (@projectId, @projectName) ->
+      0
+    @create: (projectName) ->
 
   class IzanagiWebSocket
     @SERVER_URL = "ws://nado.oknctict.tk:5000/websock/ide/"
@@ -47,6 +51,66 @@ $(() ->
       @_websocket.send JSON.stringify(data)
 
   class IzanagiConnection
+    class User
+      constructor: (@_userId = null, @_sessionId = null) ->
+      setUser: (userId, sessionId) ->
+        if @_userId != null
+          @onLogout @_userId, @_sessionId
+        if userId != null
+          @onLogin userId, sessionId
+        @_userId = userId
+        @_sessionId = sessionId
+      onLogout: () ->
+      onLogin: () ->
+    class Project
+      @STATE_READY    = 0
+      @STATE_CREATING = 1
+      @STATE_RENAMING = 2
+      @STATE_DELETING = 3
+      @STATE_EMPTY    = 4
+      @ERROR_ALREADY_EXISTS = -2
+
+      constructor: (@projectName = "", @projectId = null) ->
+        if @projectId == null
+          @state = Project.STATE_EMPTY
+        else
+          @state = Project.STATE_READY
+      create: (conn) ->
+        if @state == Project.STATE_READY
+          deferred = $.Deferred()
+          deferred.reject Project.ERROR_ALREADY_EXISTS
+          deferred.promise()
+        else
+          @state = Project.STATE_CREATING
+          conn._sendCommand("pro_create", {
+            project_name: @projectName
+          }).done((msg) =>
+            @projectId = msg.data.project_id
+            @state = Project.STATE_READY
+          )
+      rename: (conn, projectName) ->
+        @state = Project.STATE_RENAMING
+        conn._sendCommand("pro_rename", {
+          project_id: @projectId,
+          project_name: projectName
+        }).done((msg) =>
+          @projectName = projectName
+          @state = Project.STATE_READY
+        ).fail(() =>
+          @state = Project.STATE_READY
+        )
+      delete: (conn) ->
+        @state = Project.STATE_DELETING
+        conn._sendCommand("pro_delete", {
+          project_id: @projectId,
+        }).done((msg) =>
+          @projectName = ""
+          @projectId = null
+          @state = Project.STATE_EMPTY
+        ).fail(() =>
+          @state = Project.STATE_EMPTY
+        )
+
     @CONNECTION_TYPE = "ide"
     @DEFAULT_TIMEOUT = 5000
     @ERROR_TIMEOUT = -1
