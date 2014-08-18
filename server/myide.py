@@ -21,16 +21,17 @@ def receive_ide(websock, session_id, command, data):
     # user register
     if command == myconst.REGISTER_REQ:
         command = myconst.REGISTER_RES;
-        user, password, mail, grade, res = check_input.register(data);
+        res = check_input.register(data);
         if res == myconst.OK:
             print myconst.OK;
-            session_id, res = receive_ide_register(websock, user, password, mail, grade);
-        #session_id, res = receive_ide_register(websock, data[USER], data[PASS], data[MAIL], data[GRADE]);
+            session_id, res = receive_ide_register(websock, data[USER], data[PASS], data[MAIL], data[GRADE]);
         data = {RES:res}
     # login
     elif command == myconst.LOGIN_REQ:
         command = myconst.LOGIN_RES;
-        session_id, res = receive_ide_login(websock, data[USER], data[PASS]);
+        res = check_input.login(data);
+        if res == myconst.OK:
+            session_id, res = receive_ide_login(websock, data[USER], data[PASS]);
         data = {RES:res}
     # session_id whether correct websock?
     else:

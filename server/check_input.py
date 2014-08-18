@@ -3,10 +3,10 @@
 
 import myconst
 
-USER    = "user_id"
-PASS    = "password"
-MAIL    = "address"
-GRADE   = "grade"
+USER    = myconst.USER
+PASS    = myconst.PASS
+MAIL    = myconst.MAIL
+GRADE   = myconst.GRADE
 LEN         = 0;
 LEN_ALPHA   = 1;
 
@@ -32,23 +32,20 @@ def is_correct_str(string, str_len, case):
 
 '''
 ユーザー登録情報が正しいか
-@param data
+@param data             辞書型のJSONデータ
 @return user_id     ユーザーID
 @return password    パスワード
 @return mail        メールアドレス
 @return grade       学年
+@return res         正しい：0、正しくない：エラーコード
 '''
 def register(data):
-    print USER in data;
-    print PASS in data;
-    print MAIL in data;
-    print GRADE in data;
     if USER not in data or \
         PASS not in data or \
         MAIL not in data or \
         GRADE not in data:
         print "tarinai";
-        return ("", "", "", "", myconst.DATA_DEFICIENCY);
+        return myconst.DATA_DEFICIENCY;
     user_id = data[USER];
     password = data[PASS];
     mail = data[MAIL];
@@ -57,10 +54,23 @@ def register(data):
         is_correct_str(password, 32, LEN_ALPHA) != myconst.OK or \
         is_correct_str(mail, 64, LEN) != myconst.OK:
         print "nagasatoka";
-        return ("", "", "", "", myconst.DATA_NON_REGULATED);
-    return (user_id, password, mail, grade, myconst.OK);
+        return myconnst.DATA_NON_REGULATED;
+    return myconst.OK;
 
-
+'''
+ログイン情報が正しいか
+@param data             辞書型のJSONデータ
+@return user_id         ユーザーID
+@return password        パスワード
+@return res             正しい：0、正しくない：エラーコード
+'''
+def login(data):
+    if USER not in data or PASS not in data:
+        return myconst.DATA_DEFICIENCY;
+    user_id = data[USER];
+    password = data[PASS];
+    print "check_login", user_id, password;
+    return myconst.OK;
 
 
 
