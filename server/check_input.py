@@ -7,6 +7,8 @@ USER    = myconst.USER
 PASS    = myconst.PASS
 MAIL    = myconst.MAIL
 GRADE   = myconst.GRADE
+PRO_ID  = myconst.PRO_ID
+PRO_NAME= myconst.PRO_NAME
 LEN         = 0;
 LEN_ALPHA   = 1;
 
@@ -49,4 +51,15 @@ def login(data):
         return myconst.DATA_DEFICIENCY;
     return myconst.OK;
 
+def pro_create(data):
+    if PRO_NAME not in data:
+        return myconst.DATA_DEFICIENCY;
+    if is_correct_str(data[PRO_NAME], 64, LEN_ALPHA) != myconst.OK:
+        return myconst.DATA_NON_REGULATED;
+    return myconst.OK;
+
+def pro_delete(data):
+    if PRO_ID not in data:
+        return myconst.DATA_DEFICIENCY;
+    return myconst.OK;
 

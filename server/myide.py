@@ -39,12 +39,8 @@ def receive_ide(websock, session_id, command, data):
     # project_create
     if command == myconst.PRO_CREATE_REQ:
         command = myconst.PRO_CREATE_RES;
-        res = check_input.pro_create(data);
-        if res == myconst.OK:
-            project_id, res = receive_ide_pro_create(user_id, data[PRO_NAME]);
-            data = {PRO_ID:project_id, RES:res};
-        else:
-            data = {PRO_ID:"", RES:res};
+        project_id, res = receive_ide_pro_create(user_id, data);
+        data = {PRO_ID:project_id, RES:res};
     # project_list
     elif command == myconst.PRO_LIST_REQ:
         command = myconst.PRO_LIST_RES;
@@ -53,7 +49,7 @@ def receive_ide(websock, session_id, command, data):
     # project_delete
     elif command == myconst.PRO_DELETE_REQ:
         command = myconst.PRO_DELETE_RES;
-        res = receive_ide_pro_delete(data[PRO_ID]);
+        res = receive_ide_pro_delete(data);
         data = {RES:res};
     # file_save
     elif command == myconst.SAVE_REQ:
@@ -104,7 +100,11 @@ def receive_ide_login(websock, data):
     session_id = CONNECTION_MANAGER.append(myconst.IDE, websock, user_id);
     return (session_id, myconst.OK);
 
-def receive_ide_pro_create(user_id, project_name):
+def receive_ide_pro_create(user_id, data):
+    res = check_input.pro_create(data);
+    if res != myconst.OK:
+        return ("", res);
+    project_name = data[PRO_NAME];
     # check is project_name unique
     if project_manager.check_unique_project_name(user_id, project_name) is False:
         return ("", myconst.PROJECT_EXISTING);
@@ -112,7 +112,11 @@ def receive_ide_pro_create(user_id, project_name):
     project_id = project_manager.create(user_id, project_name);
     return (project_id, myconst.OK);
     
-def receive_ide_pro_delete(project_id):
+def receive_ide_pro_delete(data):
+    res = check_input.pro_delete(data);
+    if res != myconst.OK:
+        return ("", res);
+    project_id = data[PRO_ID];
     # check is project_id
     if project_manager.is_valid_project_id(project_id) is False:
         return (myconst.PROJECT_NO_EXISTING);
