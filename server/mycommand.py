@@ -6,14 +6,17 @@ import json
 import random
 import hashlib
 
-def send_ide(websock, session_id, command, data):
-    json_data = make_json(myconst.IDE, session_id, command, data);
+'''
+Websocketを使ってIDE か Androidに送信をする
+@param websock
+@param connection_type
+@param session_id
+@param command
+@param data
+'''
+def send_websock(websock, connection_type, session_id, command, data):
+    json_data = make_json(connection_type, session_id, command, data);
     websock.send(json_data);
-
-def send_android(websock, session_id, command, data):
-    json_data = make_json(myconst.ANDROID, session_id, command, data);
-    get_ws = get_conection(session_id);
-    ws.send(json_data);
 
 '''
 送信するときに必要なjson形式をつくる
