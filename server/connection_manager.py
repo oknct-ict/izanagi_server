@@ -14,12 +14,18 @@ USER = myconst.USER
 CONN = myconst.CONN
 LIMIT_CONNECTION_NUM = 3
 
+
+'''
+IDE⇔サーバ、Android⇔サーバ の通信を管理する。
+@インスタンス変数 _connections[connection_type]{}    キー：セッションID、値：ユーザーID、Websocket
+@インスタンス変数 _connection_count[connection_type]{}   キー：ユーザーID、値：そのユーザーは現在同時に何個ログインしているのか
+connection_type はandroid かideが入る
+
+'''
 class _ConnectionManager(object):
     '''
     ConnectionManagerクラスの初期化を行う
-    @インスタンス変数 _connections[type]{}    キー：セッションID、値：ユーザーID、Websocket
-    @インスタンス変数 _connection_count[type]{}   キー：ユーザーID、値：そのユーザーは現在同時に何個ログインしているのか
-    type はandroid か ideが入る
+    _connections[]{}、_connection_count[]{} 2つのインスタンス変数の空の変数を宣言する
     '''
     def __init__(self):
         self._connections = {}
