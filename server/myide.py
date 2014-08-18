@@ -175,11 +175,16 @@ def receive_ide_pro_delete(user_id, data):
 @return res         成功：0、失敗：エラーコード
 '''
 def receive_ide_pro_rename(user_id, data):
+    res = check_input.pro_rename(data);
+    if res != myconst.OK:
+        return (res);
     project_id = data[PRO_ID];
     project_name = data[PRO_NAME];
     # check is project_id
     if project_manager.is_valid_project_id(user_id, project_id) is False:
         return (myconst.PROJECT_NO_EXISTING);
+    if project_manager.check_unique_project_name(user_id, project_name) is False:
+        return (myconst.PROJECT_EXISTING);
     project_manager.rename(project_id, project_name);
     return (myconst.OK);
 
