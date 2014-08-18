@@ -63,3 +63,7 @@ def pro_delete(data):
         return myconst.DATA_DEFICIENCY;
     return myconst.OK;
 
+def pro_rename(data):
+    if PRO_ID not in data or PRO_NAME not in data:
+        return myconst.DATA_DEFICIENCY;
+    return myconst.OK
