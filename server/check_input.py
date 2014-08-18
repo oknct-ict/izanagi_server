@@ -30,15 +30,6 @@ def is_correct_str(string, str_len, case):
             return myconst.DATA_NON_REGULATED;
     return myconst.OK
 
-'''
-ユーザー登録情報が正しいか
-@param data             辞書型のJSONデータ
-@return user_id     ユーザーID
-@return password    パスワード
-@return mail        メールアドレス
-@return grade       学年
-@return res         正しい：0、正しくない：エラーコード
-'''
 def register(data):
     if USER not in data or \
         PASS not in data or \
@@ -46,33 +37,16 @@ def register(data):
         GRADE not in data:
         print "tarinai";
         return myconst.DATA_DEFICIENCY;
-    user_id = data[USER];
-    password = data[PASS];
-    mail = data[MAIL];
-    grade = data[GRADE];
-    if is_correct_str(user_id, 16, LEN_ALPHA) != myconst.OK or \
-        is_correct_str(password, 32, LEN_ALPHA) != myconst.OK or \
-        is_correct_str(mail, 64, LEN) != myconst.OK:
+    if is_correct_str(data[USER], 16, LEN_ALPHA) != myconst.OK or \
+        is_correct_str(data[PASS], 32, LEN_ALPHA) != myconst.OK or \
+        is_correct_str(data[MAIL], 64, LEN) != myconst.OK:
         print "nagasatoka";
         return myconnst.DATA_NON_REGULATED;
     return myconst.OK;
 
-'''
-ログイン情報が正しいか
-@param data             辞書型のJSONデータ
-@return user_id         ユーザーID
-@return password        パスワード
-@return res             正しい：0、正しくない：エラーコード
-'''
 def login(data):
     if USER not in data or PASS not in data:
         return myconst.DATA_DEFICIENCY;
-    user_id = data[USER];
-    password = data[PASS];
-    print "check_login", user_id, password;
     return myconst.OK;
-
-
-
 
 

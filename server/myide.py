@@ -21,17 +21,12 @@ def receive_ide(websock, session_id, command, data):
     # user register
     if command == myconst.REGISTER_REQ:
         command = myconst.REGISTER_RES;
-        res = check_input.register(data);
-        if res == myconst.OK:
-            print myconst.OK;
-            session_id, res = receive_ide_register(websock, data[USER], data[PASS], data[MAIL], data[GRADE]);
+        session_id, res = receive_ide_register(websock, data);
         data = {RES:res}
     # login
     elif command == myconst.LOGIN_REQ:
         command = myconst.LOGIN_RES;
-        res = check_input.login(data);
-        if res == myconst.OK:
-            session_id, res = receive_ide_login(websock, data[USER], data[PASS]);
+        session_id, res = receive_ide_login(websock, data);
         data = {RES:res}
     # session_id whether correct websock?
     else:
@@ -44,8 +39,12 @@ def receive_ide(websock, session_id, command, data):
     # project_create
     if command == myconst.PRO_CREATE_REQ:
         command = myconst.PRO_CREATE_RES;
-        project_id, res = receive_ide_pro_create(user_id, data[PRO_NAME]);
-        data = {PRO_ID:project_id, RES:res};
+        res = check_input.pro_create(data);
+        if res == myconst.OK:
+            project_id, res = receive_ide_pro_create(user_id, data[PRO_NAME]);
+            data = {PRO_ID:project_id, RES:res};
+        else:
+            data = {PRO_ID:"", RES:res};
     # project_list
     elif command == myconst.PRO_LIST_REQ:
         command = myconst.PRO_LIST_RES;
@@ -72,7 +71,14 @@ def receive_ide(websock, session_id, command, data):
     print session_id, command, data;
     return (session_id, command, data);
 
-def receive_ide_register(websock, user_id, password, address, grade):
+def receive_ide_register(websock, data):
+    res = check_input.register(data);
+    if res != myconst.OK:
+        return ("", res);
+    user_id = data[USER];
+    password = data[PASS];
+    mail = data[MAIL];
+    grade = data[GRADE];
     # check is user_id unique
     if user_manager.check_unique_user_id(user_id) is False:
         return ("", myconst.USER_EXISTING);
@@ -80,7 +86,12 @@ def receive_ide_register(websock, user_id, password, address, grade):
     session_id = CONNECTION_MANAGER.append(myconst.IDE, websock, user_id);
     return (session_id, myconst.OK);
 
-def receive_ide_login(websock, user_id, password):
+def receive_ide_login(websock, data):
+    res = check_input.login(data);
+    if res != myconst.OK:
+        return ("", res);
+    user_id = data[USER];
+    password = data[PASS];
     # userdata check
     if user_manager.is_valid_user_id(user_id, password) is False:
         # no user data 
