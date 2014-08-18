@@ -1,5 +1,16 @@
-IDE = "ide"
-ANDROID = "android"
+IDE         = "ide"
+ANDROID     = "android"
+
+USER        = "user_id"
+PASS        = "password"
+MAIL        = "address"
+GRADE       = "grade"
+CONN        = "connection"
+RES         = "result"
+PRO_ID      = "project_id"
+PRO_NAME    = "project_name"
+PRO_LIST    = "project_list"
+
 
 # result
 OK = 0
