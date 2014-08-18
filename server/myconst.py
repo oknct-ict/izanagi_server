@@ -12,6 +12,17 @@ PRO_NAME    = "project_name"
 PRO_LIST    = "project_list"
 
 
+USER        = "user_id"
+PASS        = "password"
+MAIL        = "address"
+GRADE       = "grade"
+CONN        = "connection"
+RES         = "result"
+PRO_ID      = "project_id"
+PRO_NAME    = "project_name"
+PRO_LIST    = "project_list"
+
+
 # result
 OK = 0
 
@@ -45,4 +56,5 @@ FILE_EXISTING       = 130
 FILE_NO_EXISTING    = 131 
 FORMAT_INCORRECT    = 200
 DATA_DEFICIENCY     = 201
+DATA_NON_REGULATED  = 202
 
