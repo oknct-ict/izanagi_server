@@ -1,116 +1,284 @@
 (function() {
   $(function() {
-    var editor, event_handlers, make_msg, send, session_id, show_toast, ws;
+    var IzanagiConnection, IzanagiWebSocket, User, con, editor, showToast;
     editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
       lineNumbers: true,
       mode: "text/x-vb",
       matchBrackets: true
     });
-    ws = new WebSocket("ws://nado.oknctict.tk:5000/websock/ide/");
-    session_id = null;
-    event_handlers = {};
-    make_msg = function(command, data) {
-      var sid;
-      if (session_id === null) {
-        sid = "";
-      } else {
-        sid = session_id;
-      }
-      return JSON.stringify({
-        type: "ide",
-        session_id: sid,
-        command: command + "_REQ",
-        data: data
-      });
-    };
-    send = function(command, data, timeout) {
-      var deferred, msg, timer_id;
-      data || (data = {});
-      timeout || (timeout = 5000);
-      msg = make_msg(command, data);
-      deferred = $.Deferred();
-      timer_id = setTimeout(function() {
-        return deferred.reject();
-      }, timeout);
-      event_handlers[command + "_RES"] = function(m) {
-        deferred.resolve(m);
-        return clearTimeout(timer_id);
-      };
-      ws.send(msg);
-      console.log("Send:");
-      console.log(msg);
-      return deferred.promise();
-    };
-    show_toast = function(text) {
+    showToast = function(text) {
       var toast;
       toast = $('<div class="toast fade"><button type="button" class="close" data-dismiss="alert"></button><div class="toast-body"><p>' + text + '</p></div>');
       return $("#alerts-container").append(toast.addClass("in"));
     };
-    ws.onerror = function(error) {
-      return show_toast("please reload this web page");
-    };
-    ws.onmessage = function(event) {
-      var msg;
-      msg = JSON.parse(event.data);
-      console.log("Receive:");
-      console.log(msg);
-      if (msg.command in event_handlers) {
-        event_handlers[msg.command](msg);
+    User = (function() {
+      function User(userId, sessionId) {
+        if (userId == null) {
+          userId = null;
+        }
+        if (sessionId == null) {
+          sessionId = null;
+        }
+        this._userId = userId;
+        this._sessionId = sessionId;
       }
-      return 0;
-    };
+
+      User.prototype.setUser = function(userId, sessionId) {
+        if (userId === null) {
+          if (this._userId !== null) {
+            this.onLogout(this._userId, this._sessionId);
+          }
+          this._userId = userId;
+          return this._sessionId = sessionId;
+        } else if (userId !== this._userId) {
+          if (this._userId !== null) {
+            this.onLogout(this._userId, this._sessionId);
+          }
+          this.onLogin(userId, sessionId);
+          this._userId = userId;
+          return this._sessionId = sessionId;
+        } else {
+          return this._sessionId = sessionId;
+        }
+      };
+
+      User.prototype.onLogout = function() {
+        return 0;
+      };
+
+      User.prototype.onLogin = function() {
+        return 0;
+      };
+
+      return User;
+
+    })();
+    IzanagiWebSocket = (function() {
+      IzanagiWebSocket.SERVER_URL = "ws://nado.oknctict.tk:5000/websock/ide/";
+
+      function IzanagiWebSocket(receiver, error) {
+        receiver || (receiver = function() {
+          return 0;
+        });
+        error || (error = function() {
+          return 0;
+        });
+        this._websocket = new WebSocket(IzanagiWebSocket.SERVER_URL);
+        this._websocket.onerror = error;
+        this._websocket.onmessage = function(event) {
+          return receiver(JSON.parse(event.data));
+        };
+      }
+
+      IzanagiWebSocket.prototype.sendJSON = function(data) {
+        return this._websocket.send(JSON.stringify(data));
+      };
+
+      return IzanagiWebSocket;
+
+    })();
+    IzanagiConnection = (function() {
+      IzanagiConnection.CONNECTION_TYPE = "ide";
+
+      IzanagiConnection.DEFAULT_TIMEOUT = 5000;
+
+      IzanagiConnection.ERROR_TIMEOUT = -1;
+
+      function IzanagiConnection() {
+        this._user = new User();
+        this._eventHandlers = {};
+        this._izanagiWebSocket = new IzanagiWebSocket((function(_this) {
+          return function(msg) {
+            if (msg.command in _this._eventHandlers) {
+              _this._eventHandlers[msg.command](msg);
+              delete _this._eventHandlers[msg.command];
+            }
+            return 0;
+          };
+        })(this), function() {
+          return showToast("please reload this web page");
+        });
+        this._validResponse = function(msg) {
+          return msg.data.result < 100;
+        };
+        this._makePacket = function(command, data) {
+          var sid;
+          if (this._user._sessionId === null) {
+            sid = "";
+          } else {
+            sid = this._user._sessionId;
+          }
+          return {
+            type: IzanagiConnection.CONNECTION_TYPE,
+            session_id: sid,
+            command: command + "_REQ",
+            data: data
+          };
+        };
+        this._sendCommand = function(command, data, timeout) {
+          var deferred, timerId;
+          if (data == null) {
+            data = {};
+          }
+          if (timeout == null) {
+            timeout = IzanagiConnection.DEFAULT_TIMEOUT;
+          }
+          deferred = $.Deferred();
+          timerId = setTimeout(function() {
+            return deferred.reject(IzanagiConnection.ERROR_TIMEOUT);
+          }, timeout);
+          this._eventHandlers[command + "_RES"] = (function(_this) {
+            return function(m) {
+              if (_this._validResponse(m)) {
+                deferred.resolve(m);
+              } else {
+                deferred.reject(m.data.result);
+              }
+              return clearTimeout(timerId);
+            };
+          })(this);
+          this._izanagiWebSocket.sendJSON(this._makePacket(command, data));
+          return deferred.promise();
+        };
+        0;
+      }
+
+      IzanagiConnection.prototype.login = function(userId, password) {
+        return this._sendCommand("login", {
+          user_id: userId,
+          password: password
+        }).done((function(_this) {
+          return function(msg) {
+            return _this._user.setUser(userId, msg.session_id);
+          };
+        })(this)).fail((function(_this) {
+          return function(error) {
+            return _this._user.setUser(null, null);
+          };
+        })(this));
+      };
+
+      IzanagiConnection.prototype.register = function(userId, password, email, grade) {
+        return this._sendCommand("register", {
+          user_id: userId,
+          password: password,
+          address: email,
+          grade: grade
+        }).done((function(_this) {
+          return function(msg) {
+            return _this._user.setUser(userId, msg.session_id);
+          };
+        })(this)).fail((function(_this) {
+          return function(error) {
+            return _this._user.setUser(null, null);
+          };
+        })(this));
+      };
+
+      IzanagiConnection.prototype.getProjects = function() {
+        return this._sendCommand("pro_list", {});
+      };
+
+      IzanagiConnection.prototype.createProject = function(projectName) {
+        return this._sendCommand("pro_create", {
+          project_name: projectName
+        });
+      };
+
+      IzanagiConnection.prototype.renameProject = function(projectId, projectName) {
+        return this._sendCommand("pro_rename", {
+          project_id: projectId,
+          project_name: projectName
+        });
+      };
+
+      IzanagiConnection.prototype.deleteProject = function(projectId) {
+        return this._sendCommand("pro_delete", {
+          project_id: projectId
+        });
+      };
+
+      IzanagiConnection.prototype.saveFile = function(projectId, dirName, fileName, code) {
+        return this._sendCommand("save", {
+          file_name: fileName,
+          project_id: projectId,
+          dir: dirName,
+          code: code
+        });
+      };
+
+      IzanagiConnection.prototype.updateFile = function(fileId, code) {
+        return this._sendCommand("renew", {
+          file_id: fileId,
+          code: code
+        });
+      };
+
+      IzanagiConnection.prototype.openFile = function(fileId) {
+        return this._sendCommand("open", {
+          file_id: fileId
+        });
+      };
+
+      IzanagiConnection.prototype.deleteFile = function(fileId) {
+        return this._sendCommand("delete", {
+          file_id: fileId
+        });
+      };
+
+      IzanagiConnection.prototype.setOnLogin = function(handler) {
+        return this._user.onLogin = handler;
+      };
+
+      IzanagiConnection.prototype.setOnLogout = function(handler) {
+        return this._user.onLogout = handler;
+      };
+
+      return IzanagiConnection;
+
+    })();
+    con = new IzanagiConnection();
+    con.setOnLogin(function(userId, sessionId) {
+      showToast("Welcome " + userId);
+      $("#icon-btn_register").addClass("disable");
+      $("#icon-btn_login").addClass("disable");
+      return $("#icon-btn_project").removeClass("disable");
+    });
+    con.setOnLogout(function(userId, sessionId) {
+      showToast("Bye " + userId);
+      $("#icon-btn_register").removeClass("disable");
+      $("#icon-btn_login").removeClass("disable");
+      return $("#icon-btn-project").addClass("disable");
+    });
     $("#projectModal").on("shown", function() {
-      return send("pro_list", {}).then(function(msg) {
-        return show_toast("pro_list passive");
-      }, function() {});
+      return con.getProjects().done(function() {});
     });
     $("#btn-login").click(function() {
-      var passwd, user_id;
-      user_id = $("#txt-login_user_id").val();
-      passwd = $("#txt-login_passwd").val();
-      return send("login", {
-        user_id: user_id,
-        password: passwd
-      }).then(function(msg) {
-        if (msg.data.result < 100) {
-          session_id = msg.session_id;
-          $("#loginModal").modal("hide");
-        } else {
-          session_id = null;
-          show_toast("login failed");
-        }
-        return 0;
-      }, function() {
-        session_id = null;
-        return show_toast("login timeout");
+      var password, userId;
+      userId = $("#txt-login_user_id").val();
+      password = $("#txt-login_passwd").val();
+      return con.login(userId, password).done(function() {
+        return $("#loginModal").modal("hide");
+      }).fail(function() {
+        return showToast("login failed");
       });
     });
     return $("#btn-register").click(function() {
-      var email, grade, passwd, passwd_confirm, school, user_id;
-      user_id = $("#txt-register_user_id").val();
-      passwd = $("#txt-register_passwd").val();
-      passwd_confirm = $("#txt-register_passwd_confirm").val();
+      var email, grade, password, passwordConfirm, school, userId;
+      userId = $("#txt-register_user_id").val();
+      password = $("#txt-register_passwd").val();
+      passwordConfirm = $("#txt-register_passwd_confirm").val();
       email = $("#txt-register_email").val();
       school = parseInt($("#select-register_school").val());
       grade = parseInt($("#select-register_grade").val());
-      if (passwd !== passwd_confirm) {
-        show_toast("password incorrect");
+      if (password !== passwordConfirm) {
+        showToast("password incorrect");
         return 0;
       }
-      return send("register", {
-        user_id: user_id,
-        password: passwd,
-        address: email,
-        grade: school * 10 + grade
-      }).then(function(msg) {
-        if (msg.data.result < 100) {
-          session_id = msg.session_id;
-          return $("#registerModal").modal("hide");
-        } else {
-          return show_toast("registration failed");
-        }
-      }, function() {
-        return show_toast("registration timeout");
+      return con.register(userId, password, email, school * 10 + grade).done(function() {
+        return $("#registerModal").modal("hide");
+      }).fail(function() {
+        return showToast("registration failed");
       });
     });
   });
