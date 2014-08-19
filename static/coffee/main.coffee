@@ -25,16 +25,17 @@ $(() ->
 
   class IzanagiConnection
     class User
-      constructor: (@_userId = null, @_sessionId = null) ->
+      constructor: (@userId = null, @sessionId = null) ->
       setUser: (userId, sessionId) ->
-        if @_userId != null
-          @onLogout @_userId, @_sessionId
+        if @userId != null
+          @onLogout @userId, @sessionId
         if userId != null
           @onLogin userId, sessionId
-        @_userId = userId
-        @_sessionId = sessionId
+        @userId = userId
+        @sessionId = sessionId
       onLogout: () ->
       onLogin: () ->
+
     class Project
       @STATE_READY    = 0
       @STATE_CREATING = 1
@@ -83,7 +84,29 @@ $(() ->
         ).fail(() =>
           @state = Project.STATE_EMPTY
         )
-
+    class File
+      constructor: (@projectId = null, @fileName = "", @dir = "/", @code = "", @fileId = null) ->
+      save: (conn) ->
+        conn._sendCommand("save", {
+          file_name: @fileName,
+          project_id: @projectId,
+          dir: @dir,
+          code: @code,
+        }).done((msg) =>
+          @fileId = msg.data.file_id
+        )
+      renew: (conn) ->
+        conn._sendCommand("renew", {
+          file_id: @fileId,
+          code: @code
+        })
+      open: (conn) ->
+        conn._sendCommand("open", {
+          file_id: @fileId
+        }).done((msg) =>
+          @code = msg.data.code
+        )
+      
     @CONNECTION_TYPE = "ide"
     @DEFAULT_TIMEOUT = 5000
     @ERROR_TIMEOUT = -1
@@ -107,7 +130,12 @@ $(() ->
           sid = ""
         else
           sid = @_user._sessionId
-        {type: IzanagiConnection.CONNECTION_TYPE, session_id: sid, command: command + "_REQ", data: data}
+        {
+          type: IzanagiConnection.CONNECTION_TYPE,
+          session_id: sid,
+          command: command + "_REQ",
+          data: data
+        }
       @_sendCommand = (command, data = {}, timeout = IzanagiConnection.DEFAULT_TIMEOUT) ->
         deferred = $.Deferred()
         timerId = setTimeout(() ->
@@ -176,6 +204,24 @@ $(() ->
       })
     deleteFile: (fileId) ->
       @_sendCommand("delete", {
+        file_id: fileId
+      })
+    getFiles: (projectId) ->
+      @_sendCommand("list", {
+        project_id: projectId
+      })
+    renameFile: (fileId, fileName) ->
+      @_sendCommand("rename", {
+        file_id: fileId,
+        file_name: fileName
+      })
+    redirFile: (fileId, dir) ->
+      @_sendCommand("redir", {
+        file_id: fileId,
+        dir: dir
+      })
+    getFileInfo: (fileId) ->
+      @_sendCommand("info", {
         file_id: fileId
       })
     setOnLogin: (handler) ->
