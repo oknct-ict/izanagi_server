@@ -108,6 +108,11 @@ def receive_ide(websock, session_id, command, data):
         command = myconst.REDIR_RES;
         res = receive_ide_redir(data);
         data = {RES:res};
+    # info
+    elif command == myconst.INFO_REQ:
+        command = myconst.INFO_RES;
+        file_name, directory, project_id, res = receive_ide_info(data);
+        data = {RES:res, FILE_NAME:file_name, DIR:directory, PRO_ID:project_id};
 
     # response
     print session_id, command, data;
@@ -269,4 +274,15 @@ def receive_ide_redir(data):
         return (myconst.FILE_NO_EXISTING);
     file_manager.redir(file_id, directory);
     return (myconst.OK);
+
+def receive_ide_info(data):
+    res = check_input.info(data);
+    if res != myconst.OK:
+        return ("", "", "", res);
+    file_id = data[FILE_ID];
+    # check is file id
+    if file_manager.is_valid_file_id(file_id) is False:
+        return ("", "", "", myconst.FILE_NO_EXISTING);
+    file_name, directory, project_id = file_manager.info(file_id);
+    return (file_name, directory, project_id, myconst.OK);
 
