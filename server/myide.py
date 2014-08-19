@@ -98,6 +98,16 @@ def receive_ide(websock, session_id, command, data):
         command = myconst.LIST_RES;
         file_lists, res = receive_ide_list(user_id, data);
         data = {RES:res, FILE_LIST:file_lists};
+    # rename
+    elif command == myconst.RENAME_REQ:
+        command = myconst.RENAME_RES;
+        res = receive_ide_rename(data);
+        data = {RES:res};
+    # redir
+    elif command == myconst.REDIR_REQ:
+        command = myconst.REDIR_RES;
+        res = receive_ide_redir(data);
+        data = {RES:res};
 
     # response
     print session_id, command, data;
@@ -236,4 +246,27 @@ def receive_ide_list(user_id, data):
     file_lists, res = file_manager.get_lists(project_id);
     return (file_lists, res);
 
+def receive_ide_rename(data):
+    res = check_input.rename(data);
+    if res != myconst.OK:
+        return (res);
+    file_id = data[FILE_ID];
+    file_name = data[FILE_NAME];
+    # check is file id
+    if file_manager.is_valid_file_id(file_id) is False:
+        return (myconst.FILE_NO_EXISTING);
+    file_manager.rename(file_id, file_name);
+    return (myconst.OK);
+
+def receive_ide_redir(data):
+    res = check_input.redir(data);
+    if res != myconst.OK:
+        return (res);
+    file_id = data[FILE_ID];
+    directory = data[DIR];
+    # check is file id
+    if file_manager.is_valid_file_id(file_id) is False:
+        return (myconst.FILE_NO_EXISTING);
+    file_manager.redir(file_id, directory);
+    return (myconst.OK);
 

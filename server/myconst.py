@@ -31,6 +31,8 @@ RENEW_REQ           = "renew_REQ"
 OPEN_REQ            = "open_REQ"
 DELETE_REQ          = "delete_REQ"
 LIST_REQ            = "list_REQ"
+RENAME_REQ          = "rename_REQ"
+REDIR_REQ           = "redir_REQ"
 
 # command_RES
 REGISTER_RES        = "register_RES"
@@ -44,6 +46,8 @@ RENEW_RES           = "renew_RES"
 OPEN_RES            = "open_RES"
 DELETE_RES          = "delete_RES"
 LIST_RES            = "list_RES"
+RENAME_RES          = "rename_RES"
+REDIR_RES           = "redir_RES"
 
 # error
 USER_DATA_FAULT     = 100

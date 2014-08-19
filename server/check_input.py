@@ -77,7 +77,7 @@ def save(data):
         CODE not in data:
         return myconst.DATA_DEFICIENCY;
     if is_correct_str(data[FILE_NAME], 64, LEN_ALPHA) != myconst.OK or \
-        is_correct_str(data[DIR], 64, LEN_ALPHA) != myconst.OK or \
+        is_correct_str(data[DIR], 64, LEN) != myconst.OK or \
         is_correct_str(data[PRO_ID], 16, LEN_ALPHA) != myconst.OK:
         return myconst.DATA_NON_REGULATED;
     return myconst.OK;
@@ -100,5 +100,19 @@ def delete(data):
 def _list(data):
     if PRO_ID not in data:
         return myconst.DATA_DEFICIENCY;
+    return myconst.OK;
+
+def rename(data):
+    if FILE_ID not in data or FILE_NAME not in data:
+        return myconst.DATA_DEFICIENCY;
+    if is_correct_str(data[FILE_NAME], 64, LEN_ALPHA) != myconst.OK:
+        return myconst.DATA_NON_REGULATED;
+    return myconst.OK;
+
+def redir(data):
+    if FILE_ID not in data or DIR not in data:
+        return myconst.DATA_DEFICIENCY;
+    if is_correct_str(data[DIR], 64, LEN) != myconst.OK:
+        return myconst.DATA_NON_REGULATED;
     return myconst.OK;
 
