@@ -10,6 +10,11 @@ RES         = "result"
 PRO_ID      = "project_id"
 PRO_NAME    = "project_name"
 PRO_LIST    = "project_list"
+FILE_ID     = "file_id"
+FILE_NAME   = "file_name"
+FILE_LIST   = "file_list"
+DIR         = "dir"
+CODE        = "code"
 
 # result
 OK = 0
@@ -25,6 +30,9 @@ SAVE_REQ            = "save_REQ"
 RENEW_REQ           = "renew_REQ"
 OPEN_REQ            = "open_REQ"
 DELETE_REQ          = "delete_REQ"
+LIST_REQ            = "list_REQ"
+RENAME_REQ          = "rename_REQ"
+REDIR_REQ           = "redir_REQ"
 
 # command_RES
 REGISTER_RES        = "register_RES"
@@ -33,6 +41,13 @@ PRO_RENAME_RES      = "pro_rename_RES"
 PRO_DELETE_RES      = "pro_delete_RES"
 PRO_LIST_RES        = "pro_list_RES"
 LOGIN_RES           = "login_RES"
+SAVE_RES            = "save_RES"
+RENEW_RES           = "renew_RES"
+OPEN_RES            = "open_RES"
+DELETE_RES          = "delete_RES"
+LIST_RES            = "list_RES"
+RENAME_RES          = "rename_RES"
+REDIR_RES           = "redir_RES"
 
 # error
 USER_DATA_FAULT     = 100
