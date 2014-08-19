@@ -1,6 +1,6 @@
 (function() {
   $(function() {
-    var IzanagiConnection, IzanagiWebSocket, Project, User, con, editor, showToast;
+    var IzanagiConnection, IzanagiWebSocket, con, editor, showToast;
     editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
       lineNumbers: true,
       mode: "text/x-vb",
@@ -11,60 +11,6 @@
       toast = $('<div class="toast fade"><button type="button" class="close" data-dismiss="alert"></button><div class="toast-body"><p>' + text + '</p></div>');
       return $("#alerts-container").append(toast.addClass("in"));
     };
-    User = (function() {
-      function User(userId, sessionId) {
-        if (userId == null) {
-          userId = null;
-        }
-        if (sessionId == null) {
-          sessionId = null;
-        }
-        this._userId = userId;
-        this._sessionId = sessionId;
-      }
-
-      User.prototype.setUser = function(userId, sessionId) {
-        if (userId === null) {
-          if (this._userId !== null) {
-            this.onLogout(this._userId, this._sessionId);
-          }
-          this._userId = userId;
-          return this._sessionId = sessionId;
-        } else if (userId !== this._userId) {
-          if (this._userId !== null) {
-            this.onLogout(this._userId, this._sessionId);
-          }
-          this.onLogin(userId, sessionId);
-          this._userId = userId;
-          return this._sessionId = sessionId;
-        } else {
-          return this._sessionId = sessionId;
-        }
-      };
-
-      User.prototype.onLogout = function() {
-        return 0;
-      };
-
-      User.prototype.onLogin = function() {
-        return 0;
-      };
-
-      return User;
-
-    })();
-    Project = (function() {
-      function Project(projectId, projectName) {
-        this.projectId = projectId;
-        this.projectName = projectName;
-        0;
-      }
-
-      Project.create = function(projectName) {};
-
-      return Project;
-
-    })();
     IzanagiWebSocket = (function() {
       IzanagiWebSocket.SERVER_URL = "ws://nado.oknctict.tk:5000/websock/ide/";
 
@@ -90,6 +36,8 @@
 
     })();
     IzanagiConnection = (function() {
+      var Project, User;
+
       User = (function() {
         function User(_userId, _sessionId) {
           this._userId = _userId != null ? _userId : null;

@@ -10,33 +10,6 @@ $(() ->
     toast = $('<div class="toast fade"><button type="button" class="close" data-dismiss="alert"></button><div class="toast-body"><p>' + text + '</p></div>')
     $("#alerts-container").append(toast.addClass("in"))
 
-  class User
-    constructor: (userId = null, sessionId = null) ->
-      @_userId = userId
-      @_sessionId = sessionId
-    setUser: (userId, sessionId) ->
-      if userId == null
-        if @_userId != null
-          @onLogout @_userId, @_sessionId
-        @_userId = userId
-        @_sessionId = sessionId
-      else if userId != @_userId
-        if @_userId != null
-          @onLogout @_userId, @_sessionId
-        @onLogin userId, sessionId
-        @_userId = userId
-        @_sessionId = sessionId
-      else
-        @_sessionId = sessionId
-    onLogout: () ->
-      0
-    onLogin: () ->
-      0
-  class Project
-    constructor: (@projectId, @projectName) ->
-      0
-    @create: (projectName) ->
-
   class IzanagiWebSocket
     @SERVER_URL = "ws://nado.oknctict.tk:5000/websock/ide/"
     
