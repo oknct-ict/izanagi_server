@@ -37,13 +37,13 @@ def websock_ide():
                 break;
             json_data = json.loads(data);
             print json_data
-            session_id, command, data = get_json(json_data);
+            session_id, request_id, command, data = get_json(json_data);
             # if not first time login
             if command == myconst.LOGIN_REQ and session_id != "":
                 # disconnect
                 CONNECTION_MANAGER.delete(myconst.IDE, session_id);
             session_id, command, data = myide.receive_ide(websock, session_id, command, data);
-            mycommand.send_websock(websock, myconst.IDE, session_id, command, data);
+            mycommand.send_websock(websock, myconst.IDE, session_id, request_id, command, data);
             print;
     # sessin_id exist => disconnect
     if session_id is not "":
@@ -64,13 +64,13 @@ def websock_android():
                 break;
             json_data = json.loads(data);
             print json_data
-            session_id, command, data = get_json(json_data);
+            session_id, request_id, command, data = get_json(json_data);
             # if not first time login
             if command == myconst.LOGIN_REQ and session_id != "":
                 # disconnect
                 CONNECTION_MANAGER.delete(myconst.ANDROID, session_id);
             session_id, command, data = myandroid.receive_android(websock, session_id, command, data);
-            mycommand.send_websock(websock, myconst.ANDROID, session_id, command, data);
+            mycommand.send_websock(websock, myconst.ANDROID, session_id, request_id, command, data);
             print;
     # sessin_id exist => disconnect
     if session_id is not "":
@@ -86,9 +86,10 @@ def websock_android():
 '''
 def get_json(json_data):
     session_id = json_data["session_id"];
+    request_id = json_data["request_id"];
     command = json_data["command"];
     data = json_data["data"];
-    return (session_id, command, data);
+    return (session_id, request_id, command, data);
 
 @app.before_request
 def before_request():
