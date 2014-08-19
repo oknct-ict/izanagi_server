@@ -116,3 +116,8 @@ def redir(data):
         return myconst.DATA_NON_REGULATED;
     return myconst.OK;
 
+def info(data):
+    if FILE_ID not in data:
+        return myconst.DATA_DEFICIENCY;
+    return myconst.OK;
+

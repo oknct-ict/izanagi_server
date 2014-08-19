@@ -33,6 +33,7 @@ DELETE_REQ          = "delete_REQ"
 LIST_REQ            = "list_REQ"
 RENAME_REQ          = "rename_REQ"
 REDIR_REQ           = "redir_REQ"
+INFO_REQ            = "info_REQ"
 
 # command_RES
 REGISTER_RES        = "register_RES"
@@ -48,6 +49,7 @@ DELETE_RES          = "delete_RES"
 LIST_RES            = "list_RES"
 RENAME_RES          = "rename_RES"
 REDIR_RES           = "redir_RES"
+INFO_RES            = "info_RES"
 
 # error
 USER_DATA_FAULT     = 100
