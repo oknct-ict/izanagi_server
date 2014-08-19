@@ -201,25 +201,30 @@
 
       IzanagiConnection.ERROR_TIMEOUT = -1;
 
+      IzanagiConnection.MAX_REQUEST_ID = 10000;
+
       function IzanagiConnection() {
+        this._requestId = 0;
         this._user = new User();
         this._eventHandlers = {};
         this._izanagiWebSocket = new IzanagiWebSocket((function(_this) {
           return function(msg) {
-            if (msg.command in _this._eventHandlers) {
-              _this._eventHandlers[msg.command](msg);
-              delete _this._eventHandlers[msg.command];
+            if (msg.request_id in _this._eventHandlers) {
+              _this._eventHandlers[msg.request_id](msg);
+              delete _this._eventHandlers[msg.request_id];
             }
             return 0;
           };
         })(this), function() {
           return showToast("please reload this web page");
         });
-        this._validResponse = function(msg) {
-          return msg.data.result < 100;
+        this._validResponse = function(msg, command) {
+          return msg.data.result < 100 && msg.command === command + "_RES";
         };
         this._makePacket = function(command, data) {
-          var sid;
+          var rid, sid;
+          rid = this._requestId;
+          this._requestId = (this._requestId + 1) % IzanagiConnection.MAX_REQUEST_ID;
           if (this._user._sessionId === null) {
             sid = "";
           } else {
@@ -229,6 +234,7 @@
             type: IzanagiConnection.CONNECTION_TYPE,
             session_id: sid,
             command: command + "_REQ",
+            request_id: rid,
             data: data
           };
         };
@@ -244,9 +250,9 @@
           timerId = setTimeout(function() {
             return deferred.reject(IzanagiConnection.ERROR_TIMEOUT);
           }, timeout);
-          this._eventHandlers[command + "_RES"] = (function(_this) {
+          this._eventHandlers[this._requestId] = (function(_this) {
             return function(m) {
-              if (_this._validResponse(m)) {
+              if (_this._validResponse(m, command)) {
                 deferred.resolve(m);
               } else {
                 deferred.reject(m.data.result);
