@@ -1,6 +1,6 @@
 (function() {
   $(function() {
-    var IzanagiConnection, IzanagiWebSocket, Project, User, con, editor, showToast;
+    var IzanagiConnection, IzanagiWebSocket, con, editor, showToast;
     editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
       lineNumbers: true,
       mode: "text/x-vb",
@@ -11,60 +11,6 @@
       toast = $('<div class="toast fade"><button type="button" class="close" data-dismiss="alert"></button><div class="toast-body"><p>' + text + '</p></div>');
       return $("#alerts-container").append(toast.addClass("in"));
     };
-    User = (function() {
-      function User(userId, sessionId) {
-        if (userId == null) {
-          userId = null;
-        }
-        if (sessionId == null) {
-          sessionId = null;
-        }
-        this._userId = userId;
-        this._sessionId = sessionId;
-      }
-
-      User.prototype.setUser = function(userId, sessionId) {
-        if (userId === null) {
-          if (this._userId !== null) {
-            this.onLogout(this._userId, this._sessionId);
-          }
-          this._userId = userId;
-          return this._sessionId = sessionId;
-        } else if (userId !== this._userId) {
-          if (this._userId !== null) {
-            this.onLogout(this._userId, this._sessionId);
-          }
-          this.onLogin(userId, sessionId);
-          this._userId = userId;
-          return this._sessionId = sessionId;
-        } else {
-          return this._sessionId = sessionId;
-        }
-      };
-
-      User.prototype.onLogout = function() {
-        return 0;
-      };
-
-      User.prototype.onLogin = function() {
-        return 0;
-      };
-
-      return User;
-
-    })();
-    Project = (function() {
-      function Project(projectId, projectName) {
-        this.projectId = projectId;
-        this.projectName = projectName;
-        0;
-      }
-
-      Project.create = function(projectName) {};
-
-      return Project;
-
-    })();
     IzanagiWebSocket = (function() {
       IzanagiWebSocket.SERVER_URL = "ws://nado.oknctict.tk:5000/websock/ide/";
 
@@ -90,21 +36,23 @@
 
     })();
     IzanagiConnection = (function() {
+      var File, Project, User;
+
       User = (function() {
-        function User(_userId, _sessionId) {
-          this._userId = _userId != null ? _userId : null;
-          this._sessionId = _sessionId != null ? _sessionId : null;
+        function User(userId, sessionId) {
+          this.userId = userId != null ? userId : null;
+          this.sessionId = sessionId != null ? sessionId : null;
         }
 
         User.prototype.setUser = function(userId, sessionId) {
-          if (this._userId !== null) {
-            this.onLogout(this._userId, this._sessionId);
+          if (this.userId !== null) {
+            this.onLogout(this.userId, this.sessionId);
           }
           if (userId !== null) {
             this.onLogin(userId, sessionId);
           }
-          this._userId = userId;
-          return this._sessionId = sessionId;
+          this.userId = userId;
+          return this.sessionId = sessionId;
         };
 
         User.prototype.onLogout = function() {};
@@ -192,6 +140,49 @@
         };
 
         return Project;
+
+      })();
+
+      File = (function() {
+        function File(projectId, fileName, dir, code, fileId) {
+          this.projectId = projectId != null ? projectId : null;
+          this.fileName = fileName != null ? fileName : "";
+          this.dir = dir != null ? dir : "/";
+          this.code = code != null ? code : "";
+          this.fileId = fileId != null ? fileId : null;
+        }
+
+        File.prototype.save = function(conn) {
+          return conn._sendCommand("save", {
+            file_name: this.fileName,
+            project_id: this.projectId,
+            dir: this.dir,
+            code: this.code
+          }).done((function(_this) {
+            return function(msg) {
+              return _this.fileId = msg.data.file_id;
+            };
+          })(this));
+        };
+
+        File.prototype.renew = function(conn) {
+          return conn._sendCommand("renew", {
+            file_id: this.fileId,
+            code: this.code
+          });
+        };
+
+        File.prototype.open = function(conn) {
+          return conn._sendCommand("open", {
+            file_id: this.fileId
+          }).done((function(_this) {
+            return function(msg) {
+              return _this.code = msg.data.code;
+            };
+          })(this));
+        };
+
+        return File;
 
       })();
 
@@ -339,6 +330,32 @@
 
       IzanagiConnection.prototype.deleteFile = function(fileId) {
         return this._sendCommand("delete", {
+          file_id: fileId
+        });
+      };
+
+      IzanagiConnection.prototype.getFiles = function(projectId) {
+        return this._sendCommand("list", {
+          project_id: projectId
+        });
+      };
+
+      IzanagiConnection.prototype.renameFile = function(fileId, fileName) {
+        return this._sendCommand("rename", {
+          file_id: fileId,
+          file_name: fileName
+        });
+      };
+
+      IzanagiConnection.prototype.redirFile = function(fileId, dir) {
+        return this._sendCommand("redir", {
+          file_id: fileId,
+          dir: dir
+        });
+      };
+
+      IzanagiConnection.prototype.getFileInfo = function(fileId) {
+        return this._sendCommand("info", {
           file_id: fileId
         });
       };
