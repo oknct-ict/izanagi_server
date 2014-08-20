@@ -70,7 +70,7 @@ def receive_ide(websock, session_id, command, data):
         data = {RES:res};
     # file_save
     elif command == myconst.SAVE:
-        file_id, res = receive_ide_save(data);
+        file_id, res = receive_ide_save(user_id, data);
         data = {RES:res, FILE_ID:file_id};
     # renew
     elif command == myconst.RENEW:
@@ -178,7 +178,7 @@ def receive_ide_pro_list(user_id):
     project_list, res = project_manager.get_lists(user_id);   
     return (project_list, res);
 
-def receive_ide_save(data):
+def receive_ide_save(user_id, data):
     res = check_input.save(data);
     if res != myconst.OK:
         return ("", res);
@@ -186,6 +186,9 @@ def receive_ide_save(data):
     project_id = data[PRO_ID];
     directory = data[DIR];
     code = data[CODE];
+    # check use_id and project_id
+    if project_manager.is_valid_project_id(user_id, project_id) is False:
+        return ("", myconst.PROJECT_NO_EXISTING);
     # check is file_name unique
     if file_manager.check_unique_file_name(project_id, file_name) is False:
         return ("", myconst.FILE_EXISTING);
@@ -232,6 +235,7 @@ def receive_ide_list(user_id, data):
     if res != myconst.OK:
         return ({}, res);
     project_id = data[PRO_ID];
+    # check use_id and project_id
     if project_manager.is_valid_project_id(user_id, project_id) is False:
         return ({}, myconst.PROJECT_NO_EXISTING);
     file_lists, res = file_manager.get_lists(project_id);
