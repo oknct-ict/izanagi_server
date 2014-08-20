@@ -24,6 +24,11 @@ app.pyから呼ばれ、コマンドを見て関数を呼ぶ
 @return data
 '''
 def receive_android(websock, session_id, command, data):
+    # user_register
+    if command == myconst.REGISTER_REQ:
+        command = myconst.REGISTER_RES;
+        session_id, res = receive_android_register(websock, data);
+        data = {RES:res}
     # user_login
     if command == myconst.LOGIN_REQ:
         command = myconst.LOGIN_RES;
@@ -34,14 +39,21 @@ def receive_android(websock, session_id, command, data):
     print session_id, command, data;
     return (session_id, command, data);
 
-'''
-ログインをする
-@param websock
-@param user_id      ユーザーID
-@param password     パスワード（平文）
-@return session_id  成功：セッションID、失敗：空文字列
-@return res         成功：0、失敗：エラーコード
-'''
+def recieve_android_register(websock, data):
+    res = check_input.register(data);
+    if res != myconst.OK:
+        return ("", res);
+    user_id = data[USER];
+    password = data[PASS];
+    address = data[MAIL];
+    grade = data[GRADE];
+    # chech is user_id unique
+    if user_manager.check_unique_user_id(user_id) is False:
+        return ("", myconst.USER_EXISTING);
+    user_manager.append(user_id, password, address, grade);
+    session_id = CONNECTION_MANAGER.append(myconst.ANDROID, websock, user_id);
+    return (session_id, myconst.OK);
+
 def receive_android_login(websock, data):
     res = check_input.login(data);
     if res != myconst.OK:
