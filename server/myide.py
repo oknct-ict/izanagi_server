@@ -27,22 +27,20 @@ CODE        = myconst.CODE
 app.pyから呼ばれ、コマンドを見て関数を呼ぶ
 @param websock
 @param session_id
-@oaram command      必ずhoge_REQの形式になる
+@oaram command   
 @param data
 
 @return session_id
-@return command　   必ずhoge_RESの形式になる
+@return command
 @return data
 '''
 def receive_ide(websock, session_id, command, data):
     # user register
-    if command == myconst.REGISTER_REQ:
-        command = myconst.REGISTER_RES;
-        session_id, res = receive_ide_register(websock, data);
+    if command == myconst.REGISTER:
+        res = receive_ide_register(websock, data);
         data = {RES:res}
     # login
-    elif command == myconst.LOGIN_REQ:
-        command = myconst.LOGIN_RES;
+    elif command == myconst.LOGIN:
         session_id, res = receive_ide_login(websock, data);
         data = {RES:res}
     # session_id whether correct websock?
@@ -50,67 +48,56 @@ def receive_ide(websock, session_id, command, data):
         if CONNECTION_MANAGER.is_valid_websocket(myconst.IDE, session_id, websock) is False:
             # not correct 
             return (None, None, None);   
+    
     # get user_id from session_id
     user_id = CONNECTION_MANAGER.get_user_id(myconst.IDE, session_id);
     
     # project_create
-    if command == myconst.PRO_CREATE_REQ:
-        command = myconst.PRO_CREATE_RES;
+    if command == myconst.PRO_CREATE:
         project_id, res = receive_ide_pro_create(user_id, data);
         data = {PRO_ID:project_id, RES:res};
     # project_list
-    elif command == myconst.PRO_LIST_REQ:
-        command = myconst.PRO_LIST_RES;
+    elif command == myconst.PRO_LIST:
         project_lists, res = receive_ide_pro_list(user_id);
         data = {PRO_LIST:project_lists, RES:res};
     # project_delete
-    elif command == myconst.PRO_DELETE_REQ:
-        command = myconst.PRO_DELETE_RES;
+    elif command == myconst.PRO_DELETE:
         res = receive_ide_pro_delete(user_id, data);
         data = {RES:res};
     # project_rename
-    elif command == myconst.PRO_RENAME_REQ:
-        command = myconst.PRO_RENAME_RES;
+    elif command == myconst.PRO_RENAME:
         res = receive_ide_pro_rename(user_id, data);
         data = {RES:res};
     # file_save
-    elif command == myconst.SAVE_REQ:
-        command = myconst.SAVE_RES;
+    elif command == myconst.SAVE:
         file_id, res = receive_ide_save(data);
         data = {RES:res, FILE_ID:file_id};
     # renew
-    elif command == myconst.RENEW_REQ:
-        command = myconst.RENEW_RES;
+    elif command == myconst.RENEW:
         res = receive_ide_renew(data);
         data = {RES:res};
     # open
-    elif command == myconst.OPEN_REQ:
-        command = myconst.OPEN_RES;
+    elif command == myconst.OPEN:
         code, res = receive_ide_open(data);
         data = {RES:res, CODE:code};
     # delete
-    elif command == myconst.DELETE_REQ:
-        command = myconst.DELETE_RES;
+    elif command == myconst.DELETE:
         res = receive_ide_delete(data);
         data = {RES:res};
     # list
-    elif command == myconst.LIST_REQ:
-        command = myconst.LIST_RES;
+    elif command == myconst.LIST:
         file_lists, res = receive_ide_list(user_id, data);
         data = {RES:res, FILE_LIST:file_lists};
     # rename
-    elif command == myconst.RENAME_REQ:
-        command = myconst.RENAME_RES;
+    elif command == myconst.RENAME:
         res = receive_ide_rename(data);
         data = {RES:res};
     # redir
-    elif command == myconst.REDIR_REQ:
-        command = myconst.REDIR_RES;
+    elif command == myconst.REDIR:
         res = receive_ide_redir(data);
         data = {RES:res};
     # info
-    elif command == myconst.INFO_REQ:
-        command = myconst.INFO_RES;
+    elif command == myconst.INFO:
         file_name, directory, project_id, res = receive_ide_info(data);
         data = {RES:res, FILE_NAME:file_name, DIR:directory, PRO_ID:project_id};
 
@@ -129,9 +116,7 @@ def receive_ide_register(websock, data):
     # check is user_id unique
     if user_manager.check_unique_user_id(user_id) is False:
         return ("", myconst.USER_EXISTING);
-    user_manager.append(user_id, password, address, grade);
-    session_id = CONNECTION_MANAGER.append(myconst.IDE, websock, user_id);
-    return (session_id, myconst.OK);
+    return (myconst.OK);
 
 def receive_ide_login(websock, data):
     res = check_input.login(data);
