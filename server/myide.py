@@ -108,14 +108,15 @@ def receive_ide(websock, session_id, command, data):
 def receive_ide_register(websock, data):
     res = check_input.register(data);
     if res != myconst.OK:
-        return ("", res);
+        return (res);
     user_id = data[USER];
     password = data[PASS];
     address = data[MAIL];
     grade = data[GRADE];
     # check is user_id unique
     if user_manager.check_unique_user_id(user_id) is False:
-        return ("", myconst.USER_EXISTING);
+        return (myconst.USER_EXISTING);
+    user_manager.append(user_id, password, address, grade);
     return (myconst.OK);
 
 def receive_ide_login(websock, data):
@@ -133,7 +134,7 @@ def receive_ide_login(websock, data):
         # access_point is over 
         return ("", myconst.ACCESS_POINT_OVER);
     # connection 
-    session_id = CONNECTION_MANAGER.append(myconst.IDE, websock, user_id);
+    session_id = CONNECTION_MANAGER.append(myconst.IDE, websock, user_id, "");
     return (session_id, myconst.OK);
 
 def receive_ide_pro_create(user_id, data):
