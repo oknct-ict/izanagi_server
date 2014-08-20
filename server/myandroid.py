@@ -39,7 +39,7 @@ def receive_android(websock, session_id, command, data):
     print session_id, command, data;
     return (session_id, command, data);
 
-def recieve_android_register(websock, data):
+def receive_android_register(websock, data):
     res = check_input.register(data);
     if res != myconst.OK:
         return ("", res);
