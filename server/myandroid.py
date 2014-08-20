@@ -5,6 +5,7 @@ import myconst
 import user_manager
 import check_input
 from connection_manager import CONNECTION_MANAGER
+from device_manager import DEVICE_MANAGER
 
 USER        = myconst.USER 
 PASS        = myconst.PASS
@@ -70,5 +71,7 @@ def receive_android_login(websock, data):
         return ("", myconst.ACCESS_POINT_OVER);
     # connection 
     session_id = CONNECTION_MANAGER.append(myconst.ANDROID, websock, user_id);
+    # device connection
+    DEVICE_MANAGER.append(device_id, user_id, session_id);
     return (session_id, myconst.OK);
 

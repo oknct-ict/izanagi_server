@@ -37,6 +37,13 @@ LIST            = "list"
 RENAME          = "rename"
 REDIR           = "redir"
 INFO            = "info"
+WHO_ANDROID     = "who_android"
+RUN_REQUEST     = "run_request"
+SENDED_CODE     = "sended_code"
+LOG_IDE         = "log_ide"
+RUN_END_IDE     = "run_end_ide"
+LOG_ANDROID     = "log_android"
+RUN_END_ANDROID = "run_end_android"
 
 # error
 USER_DATA_FAULT     = 100

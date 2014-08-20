@@ -12,6 +12,7 @@ import server.myandroid as myandroid
 import server.myconst as myconst
 import server.mycommand as mycommand
 import server.check_input as check_input
+from server.device_manager import DEVICE_MANAGER
 from server.connection_manager import CONNECTION_MANAGER
 
 app = Flask(__name__);
@@ -83,6 +84,7 @@ def websock_android():
             if json_data["command"] == myconst.LOGIN and session_id is not None:
                 # disconnect
                 CONNECTION_MANAGER.delete(myconst.ANDROID, session_id);
+                DEVICE_MANAGER.delete_session_id(session_id);
                 session_id = None;
             session_id, request_id, command, data = get_json(json_data);
             session_id, command, data = myandroid.receive_android(websock, session_id, command, data);
@@ -90,6 +92,7 @@ def websock_android():
             print;
     # sessin_id exist => disconnect
     CONNECTION_MANAGER.delete(myconst.ANDROID, session_id);
+    DEVICE_MANAGER.delete_session_id(session_id);
     return "Disconnect";
 
 '''

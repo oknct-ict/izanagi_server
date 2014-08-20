@@ -6,6 +6,7 @@ import user_manager
 import project_manager
 import file_manager
 import check_input
+from device_manager import DEVICE_MANAGER
 from connection_manager import CONNECTION_MANAGER
 
 USER        = myconst.USER 
@@ -21,6 +22,7 @@ FILE_NAME   = myconst.FILE_NAME
 FILE_LIST   = myconst.FILE_LIST
 DIR         = myconst.DIR
 CODE        = myconst.CODE
+DEVICE_ID   = myconst.DEVICE_ID
 DEVICES     = "devices"
 
 '''
@@ -102,7 +104,7 @@ def receive_ide(websock, session_id, command, data):
         data = {RES:res, FILE_NAME:file_name, DIR:directory, PRO_ID:project_id};
     # who_android
     elif command == myconst.WHO_ANDROID:
-        devices, res = receive_ide_who_android(user_id, data);
+        devices, res = receive_ide_who_android(user_id);
         data = {RES:res, DEVICES:devices};
     # run_request
     elif command == myconst.RUN_REQUEST:
@@ -283,4 +285,12 @@ def receive_ide_info(data):
         return ("", "", "", myconst.FILE_NO_EXISTING);
     file_name, directory, project_id = file_manager.info(file_id);
     return (file_name, directory, project_id, myconst.OK);
+
+def receive_ide_who_android(user_id):
+    device_ids = DEVICE_MANAGER.get_device_id(user_id);
+    devices = [];
+    for device in device_ids:
+        devices.append({DEVICE_ID:device});
+    return (devices, myconst.OK);
+
 
