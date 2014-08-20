@@ -98,7 +98,7 @@ def receive_ide_register(websock, data):
         return ("", res);
     user_id = data[USER];
     password = data[PASS];
-    mail = data[MAIL];
+    address = data[MAIL];
     grade = data[GRADE];
     # check is user_id unique
     if user_manager.check_unique_user_id(user_id) is False:
