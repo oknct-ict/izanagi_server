@@ -216,11 +216,7 @@ $(() ->
         password: password,
         address: email,
         grade: grade,
-      }).done((msg) =>
-        @_user.setUser userId, msg.session_id
-      ).fail((error) =>
-        @_user.setUser null, null
-      )
+      })
     getProjects: () ->
       @_sendCommand("pro_list", {
       })
