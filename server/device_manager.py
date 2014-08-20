@@ -86,6 +86,15 @@ class _DeviceManger(object):
                 device_ids.append(device_id);
         return device_ids;
 
+    '''
+    user_idからdevice_idを求める
+
+    '''
+    def get_session_id(self, device_id):
+        if self.is_device_id(device_id) is False:
+            return None;
+        return self._devices[device_id][ANDROID];
+
 
 
 DEVICE_MANAGER = _DeviceManger()

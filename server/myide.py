@@ -2,6 +2,7 @@
 #coding:utf-8
 
 import myconst
+import mycommand
 import user_manager
 import project_manager
 import file_manager
@@ -9,6 +10,8 @@ import check_input
 from device_manager import DEVICE_MANAGER
 from connection_manager import CONNECTION_MANAGER
 
+IDE         = myconst.IDE
+ANDROID     = myconst.ANDROID
 USER        = myconst.USER 
 PASS        = myconst.PASS
 MAIL        = myconst.MAIL
@@ -293,4 +296,24 @@ def receive_ide_who_android(user_id):
         devices.append({DEVICE_ID:device});
     return (devices, myconst.OK);
 
+def receive_ide_run_request(data):
+    res = check_input.run_request(data);
+    if res != myconst.OK:
+        return (res);
+    device_id = data[DEVICE_ID];
+    code = data[CODE];
+    if DEVICE_MANAGER.is_device_id(device_id) is False:
+        return (myconst.DEVICE_ID_NO_EXISTING);
+    res = send_run_request(device_id, code);
+    return (res);
+
+def send_run_request(device_id, code):
+    session_id = DEVICE_MANAGER.get_session_id(device_id);
+    websock = CONNECTION_MANAGER.get_connection(ANDROID, session_id);
+    if session_id is None or websock is None:
+        return (myconst.USER_NO_EXISTING);
+    request_id = mycommand.get_request_id();
+    data = {CODE:code};
+    mycommand.send_websock(websock, ANDROID, session_id, request_id, myconst.RUN_START, data);
+    return (myconst.OK);
 

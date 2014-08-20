@@ -68,3 +68,12 @@ def get_random_str(length):
 def get_sha256(string):
     return hashlib.sha256(string).hexdigest();
 
+
+'''
+リクエストIDを生成する
+@return             Int型
+'''
+def get_request_id():
+    return random.randint(0, 2 ** 31);
+    
+

@@ -140,3 +140,8 @@ def info(data):
         return myconst.DATA_DEFICIENCY;
     return myconst.OK;
 
+def run_request(data):
+    if CODE not in data or DEVICE_ID not in data:
+        return myconst.DATA_DEFICIENCY;
+    return myconst.OK
+
