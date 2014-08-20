@@ -453,15 +453,15 @@
       };
 
       IzanagiConnection.prototype.setOnSendedCode = function(handler) {
-        return this._eventHandlers["sended_code"] = handler;
+        return this.setEventHandler("sended_code", handler);
       };
 
       IzanagiConnection.prototype.setOnLogIDE = function(handler) {
-        return this._eventHandlers["log_ide"] = handler;
+        return this._eventHandlers("log_ide", handler);
       };
 
       IzanagiConnection.prototype.setOnRunEndIDE = function(handler) {
-        return this._eventHandlers["run_end_ide"] = handler;
+        return this._eventHandlers("run_end_ide", handler);
       };
 
       return IzanagiConnection;
