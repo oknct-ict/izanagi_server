@@ -349,15 +349,7 @@
           password: password,
           address: email,
           grade: grade
-        }).done((function(_this) {
-          return function(msg) {
-            return _this._user.setUser(userId, msg.session_id);
-          };
-        })(this)).fail((function(_this) {
-          return function(error) {
-            return _this._user.setUser(null, null);
-          };
-        })(this));
+        });
       };
 
       IzanagiConnection.prototype.getProjects = function() {
@@ -454,6 +446,22 @@
 
       IzanagiConnection.prototype.setOnLogout = function(handler) {
         return this._user.onLogout = handler;
+      };
+
+      IzanagiConnection.prototype.setEventHandler = function(event, handler) {
+        return this._eventHandlers[event] = handler;
+      };
+
+      IzanagiConnection.prototype.setOnSendedCode = function(handler) {
+        return this._eventHandlers["sended_code"] = handler;
+      };
+
+      IzanagiConnection.prototype.setOnLogIDE = function(handler) {
+        return this._eventHandlers["log_ide"] = handler;
+      };
+
+      IzanagiConnection.prototype.setOnRunEndIDE = function(handler) {
+        return this._eventHandlers["run_end_ide"] = handler;
       };
 
       return IzanagiConnection;

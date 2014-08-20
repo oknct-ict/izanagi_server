@@ -283,6 +283,14 @@ $(() ->
       @_user.onLogin = handler
     setOnLogout: (handler) ->
       @_user.onLogout = handler
+    setEventHandler: (event, handler) ->
+      @_eventHandlers[event] = handler
+    setOnSendedCode: (handler) ->
+      @_eventHandlers["sended_code"] = handler
+    setOnLogIDE: (handler) ->
+      @_eventHandlers["log_ide"] = handler
+    setOnRunEndIDE: (handler) ->
+      @_eventHandlers["run_end_ide"] = handler
 
   con = new IzanagiConnection()
   con.setOnLogin (userId, sessionId) ->
