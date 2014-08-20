@@ -15,6 +15,8 @@ FILE_NAME   = "file_name"
 FILE_LIST   = "file_list"
 DIR         = "dir"
 CODE        = "code"
+DEVICE_DATA = "device_data"
+DEVICE_ID   = "device_id"
 JSON_ERROR  = "json_format_error"
 
 # result
