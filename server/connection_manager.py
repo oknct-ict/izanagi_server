@@ -63,7 +63,9 @@ class _ConnectionManager(object):
     @connection_types.validater(1)
     def delete(self, connection_type, session_id):
         # connection count update
-        user_id = self._connections[connection_type][session_id][USER];
+        user_id = self.get_user_id(connection_type, session_id);
+        if user_id is None:
+            return;
         count = self._connection_count[connection_type][user_id]
         if count == 1:
             del self._connection_count[connection_type][user_id];
@@ -71,6 +73,8 @@ class _ConnectionManager(object):
             self._connection_count[connection_type][user_id] = count - 1;
         # connection delete
         del self._connections[connection_type][session_id];
+        print "now connected list";
+        self.output(connection_type);
         return;
         
     '''

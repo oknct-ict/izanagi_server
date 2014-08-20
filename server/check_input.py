@@ -36,6 +36,16 @@ def is_correct_str(string, str_len, case):
             return myconst.DATA_NON_REGULATED;
     return myconst.OK
 
+def input_json(data):
+    if "session_id" not in data or \
+        "request_id" not in data or \
+        "command" not in data or \
+        "data" not in data or \
+        "type" not in data:
+        print "json _ error";
+        return myconst.DATA_DEFICIENCY;
+    return myconst.OK;
+    
 def register(data):
     if USER not in data or \
         PASS not in data or \

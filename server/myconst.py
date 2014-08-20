@@ -15,6 +15,7 @@ FILE_NAME   = "file_name"
 FILE_LIST   = "file_list"
 DIR         = "dir"
 CODE        = "code"
+JSON_ERROR  = "json_format_error"
 
 # result
 OK = 0
@@ -46,4 +47,5 @@ FILE_NO_EXISTING    = 131
 FORMAT_INCORRECT    = 200
 DATA_DEFICIENCY     = 201
 DATA_NON_REGULATED  = 202
+
 

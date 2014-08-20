@@ -19,6 +19,15 @@ def send_websock(websock, connection_type, session_id, request_id, command, data
     websock.send(json_data);
 
 '''
+エラーだった
+@param websock
+@param connection_type
+'''
+def send_json_error(websock, connection_type):
+    json_data = make_json(connection_type, "", "", myconst.JSON_ERROR, {});
+    websock.send(json_data);
+
+'''
 送信するときに必要なjson形式をつくる
 @param connect_type
 @param session_id
