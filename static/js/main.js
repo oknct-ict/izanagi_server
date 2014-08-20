@@ -152,15 +152,19 @@
           this.fileId = fileId != null ? fileId : null;
         }
 
-        File.prototype.save = function(conn) {
+        File.prototype.save = function(conn, projectId, fileName, dir, code) {
           return conn._sendCommand("save", {
-            file_name: this.fileName,
-            project_id: this.projectId,
-            dir: this.dir,
-            code: this.code
+            file_name: fileName,
+            project_id: projectId,
+            dir: dir,
+            code: code
           }).done((function(_this) {
             return function(msg) {
-              return _this.fileId = msg.data.file_id;
+              _this.fileId = msg.data.file_id;
+              _this.fileName = fileName;
+              _this.projectId = projectId;
+              _this.dir = dir;
+              return _this.code = code;
             };
           })(this));
         };
@@ -172,12 +176,57 @@
           });
         };
 
-        File.prototype.open = function(conn) {
+        File.prototype.open = function(conn, fileId) {
           return conn._sendCommand("open", {
+            file_id: fileId
+          }).done((function(_this) {
+            return function(msg) {
+              _this.fileId = fileId;
+              return _this.code = msg.data.code;
+            };
+          })(this));
+        };
+
+        File.prototype.getInfo = function(conn) {
+          return conn._sendCommand("info", {
             file_id: this.fileId
           }).done((function(_this) {
             return function(msg) {
-              return _this.code = msg.data.code;
+              _this.fileName = msg.data.file_name;
+              _this.dir = msg.data.dir;
+              return _this.projectId = msg.data.project_id;
+            };
+          })(this));
+        };
+
+        File.prototype["delete"] = function(conn) {
+          return conn._sendCommand("delete", {
+            file_id: this.fileId
+          }).done((function(_this) {
+            return function(msg) {
+              return _this.fileId = null;
+            };
+          })(this));
+        };
+
+        File.prototype.rename = function(conn, fileName) {
+          return conn._sendCommand("rename", {
+            file_id: this.fileId,
+            file_name: fileName
+          }).done((function(_this) {
+            return function() {
+              return _this.fileName = fileName;
+            };
+          })(this));
+        };
+
+        File.prototype.redir = function(conn, dir) {
+          return conn._sendCommand("redir", {
+            file_id: this.fileId,
+            dir: dir
+          }).done((function(_this) {
+            return function() {
+              return _this.dir = dir;
             };
           })(this));
         };
@@ -216,10 +265,10 @@
           var rid, sid;
           rid = this._requestId;
           this._requestId = (this._requestId + 1) % IzanagiConnection.MAX_REQUEST_ID;
-          if (this._user._sessionId === null) {
+          if (this._user.sessionId === null) {
             sid = "";
           } else {
-            sid = this._user._sessionId;
+            sid = this._user.sessionId;
           }
           return {
             type: IzanagiConnection.CONNECTION_TYPE,

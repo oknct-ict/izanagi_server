@@ -86,27 +86,60 @@ $(() ->
         )
     class File
       constructor: (@projectId = null, @fileName = "", @dir = "/", @code = "", @fileId = null) ->
-      save: (conn) ->
+      save: (conn, projectId, fileName, dir, code) ->
         conn._sendCommand("save", {
-          file_name: @fileName,
-          project_id: @projectId,
-          dir: @dir,
-          code: @code,
+          file_name: fileName,
+          project_id: projectId,
+          dir: dir,
+          code: code,
         }).done((msg) =>
           @fileId = msg.data.file_id
+          @fileName = fileName
+          @projectId = projectId
+          @dir = dir
+          @code = code
         )
       renew: (conn) ->
         conn._sendCommand("renew", {
           file_id: @fileId,
           code: @code
         })
-      open: (conn) ->
+      open: (conn, fileId) ->
         conn._sendCommand("open", {
-          file_id: @fileId
+          file_id: fileId
         }).done((msg) =>
+          @fileId = fileId
           @code = msg.data.code
         )
-      
+      getInfo: (conn) ->
+        conn._sendCommand("info", {
+          file_id: @fileId
+        }).done((msg) =>
+          @fileName = msg.data.file_name
+          @dir = msg.data.dir
+          @projectId = msg.data.project_id
+        )
+      delete: (conn) ->
+        conn._sendCommand("delete", {
+          file_id: @fileId
+        }).done((msg) =>
+          @fileId = null
+        )
+      rename: (conn, fileName) ->
+        conn._sendCommand("rename", {
+          file_id: @fileId,
+          file_name: fileName,
+        }).done(() =>
+          @fileName = fileName
+        )
+      redir: (conn, dir) ->
+        conn._sendCommand("redir", {
+          file_id: @fileId,
+          dir: dir
+        }).done(() =>
+          @dir = dir
+        )
+
     @CONNECTION_TYPE = "ide"
     @DEFAULT_TIMEOUT = 5000
     @ERROR_TIMEOUT = -1
@@ -130,10 +163,10 @@ $(() ->
       @_makePacket = (command, data) ->
         rid = @_requestId
         @_requestId = (@_requestId + 1) % IzanagiConnection.MAX_REQUEST_ID
-        if @_user._sessionId == null
+        if @_user.sessionId == null
           sid = ""
         else
-          sid = @_user._sessionId
+          sid = @_user.sessionId
         {
           type: IzanagiConnection.CONNECTION_TYPE,
           session_id: sid,
