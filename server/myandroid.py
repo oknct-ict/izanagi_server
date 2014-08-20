@@ -16,22 +16,20 @@ RES = myconst.RES
 app.pyから呼ばれ、コマンドを見て関数を呼ぶ
 @param websock
 @param session_id
-@oaram command      必ずhoge_REQの形式になる
+@oaram command
 @param data
 
 @return session_id
-@return command　   必ずhoge_RESの形式になる
+@return command　   
 @return data
 '''
 def receive_android(websock, session_id, command, data):
     # user_register
-    if command == myconst.REGISTER_REQ:
-        command = myconst.REGISTER_RES;
-        session_id, res = receive_android_register(websock, data);
+    if command == myconst.REGISTER:
+        res = receive_android_register(websock, data);
         data = {RES:res}
     # user_login
-    if command == myconst.LOGIN_REQ:
-        command = myconst.LOGIN_RES;
+    if command == myconst.LOGIN:
         session_id, res = receive_android_login(websock, data);
         data = {RES:res}
 
@@ -50,9 +48,7 @@ def receive_android_register(websock, data):
     # chech is user_id unique
     if user_manager.check_unique_user_id(user_id) is False:
         return ("", myconst.USER_EXISTING);
-    user_manager.append(user_id, password, address, grade);
-    session_id = CONNECTION_MANAGER.append(myconst.ANDROID, websock, user_id);
-    return (session_id, myconst.OK);
+    return (myconst.OK);
 
 def receive_android_login(websock, data):
     res = check_input.login(data);

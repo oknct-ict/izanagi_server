@@ -16,6 +16,17 @@ Websocketを使ってIDE か Androidに送信をする
 '''
 def send_websock(websock, connection_type, session_id, request_id, command, data):
     json_data = make_json(connection_type, session_id, request_id, command, data);
+    print "send:", json_data;
+    websock.send(json_data);
+
+'''
+エラーだった
+@param websock
+@param connection_type
+'''
+def send_json_error(websock, connection_type):
+    json_data = make_json(connection_type, "", "", myconst.JSON_ERROR, {});
+    print "send:", json_data;
     websock.send(json_data);
 
 '''
