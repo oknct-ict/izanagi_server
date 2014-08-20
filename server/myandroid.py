@@ -6,11 +6,13 @@ import user_manager
 import check_input
 from connection_manager import CONNECTION_MANAGER
 
-USER = myconst.USER 
-PASS = myconst.PASS
-MAIL = myconst.MAIL
-GRADE = myconst.GRADE
-RES = myconst.RES
+USER        = myconst.USER 
+PASS        = myconst.PASS
+MAIL        = myconst.MAIL
+GRADE       = myconst.GRADE
+RES         = myconst.RES
+DEVICE_ID   = myconst.DEVICE_ID
+DEVICE_DATA = myconst.DEVICE_DATA
 
 '''
 app.pyから呼ばれ、コマンドを見て関数を呼ぶ
@@ -51,11 +53,12 @@ def receive_android_register(websock, data):
     return (myconst.OK);
 
 def receive_android_login(websock, data):
-    res = check_input.login(data);
+    res = check_input.login_android(data);
     if res != myconst.OK:
         return ("", res);
     user_id = data[USER];
     password = data[PASS];
+    device_id = data[DEVICE_DATA][DEVICE_ID];
     # userdata check
     if user_manager.is_valid_user_id(user_id, password) is False:
         # no user data 
@@ -65,6 +68,6 @@ def receive_android_login(websock, data):
         # access_point is over 
         return ("", myconst.ACCESS_POINT_OVER);
     # connection 
-    session_id = CONNECTION_MANAGER.append(myconst.ANDROID, websock, user_id);
+    session_id = CONNECTION_MANAGER.append(myconst.ANDROID, websock, user_id, device_id);
     return (session_id, myconst.OK);
 
