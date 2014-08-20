@@ -142,6 +142,14 @@ $(() ->
           @dir = dir
         )
 
+    class Device
+      constructor: (@deviceId) ->
+      run: (conn, code) ->
+        conn._sendCommand("run_request", {
+          device_id: @deviceId,
+          code: code
+        })
+
     @CONNECTION_TYPE = "ide"
     @DEFAULT_TIMEOUT = 5000
     @ERROR_TIMEOUT = -1
@@ -266,6 +274,14 @@ $(() ->
     getFileInfo: (fileId) ->
       @_sendCommand("info", {
         file_id: fileId
+      })
+    getDevices: () ->
+      @_sendCommand("who_android", {
+      })
+    runReuqest: (deviceId, code) ->
+      @_sendCommand("run_request", {
+        device_id: deviceId,
+        code: code
       })
     setOnLogin: (handler) ->
       @_user.onLogin = handler
