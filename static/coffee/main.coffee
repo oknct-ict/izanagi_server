@@ -148,12 +148,15 @@ $(() ->
     constructor: () ->
       @_requestId = 0
       @_user = new User()
+      @_responseHandlers = {}
       @_eventHandlers = {}
       @_izanagiWebSocket = new IzanagiWebSocket(
         (msg) =>
-          if msg.request_id of @_eventHandlers
-            @_eventHandlers[msg.request_id](msg)
-            delete @_eventHandlers[msg.request_id]
+          if msg.request_id of @_responseHandlers
+            @_reponseHandlers[msg.request_id](msg)
+            delete @_reponseHandlers[msg.request_id]
+          else if msg.command of @_eventHandlers
+            @_eventHandlers[msg.command](msg)
           0
         , () ->
           showToast "please reload this web page"
@@ -179,7 +182,7 @@ $(() ->
         timerId = setTimeout(() ->
           deferred.reject(IzanagiConnection.ERROR_TIMEOUT)
         , timeout)
-        @_eventHandlers[@_requestId] = (m) =>
+        @_responseHandlers[@_requestId] = (m) =>
           if @_validResponse m, command
             deferred.resolve m
           else

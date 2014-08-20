@@ -246,12 +246,15 @@
       function IzanagiConnection() {
         this._requestId = 0;
         this._user = new User();
+        this._responseHandlers = {};
         this._eventHandlers = {};
         this._izanagiWebSocket = new IzanagiWebSocket((function(_this) {
           return function(msg) {
-            if (msg.request_id in _this._eventHandlers) {
-              _this._eventHandlers[msg.request_id](msg);
-              delete _this._eventHandlers[msg.request_id];
+            if (msg.request_id in _this._responseHandlers) {
+              _this._reponseHandlers[msg.request_id](msg);
+              delete _this._reponseHandlers[msg.request_id];
+            } else if (msg.command in _this._eventHandlers) {
+              _this._eventHandlers[msg.command](msg);
             }
             return 0;
           };
@@ -290,7 +293,7 @@
           timerId = setTimeout(function() {
             return deferred.reject(IzanagiConnection.ERROR_TIMEOUT);
           }, timeout);
-          this._eventHandlers[this._requestId] = (function(_this) {
+          this._responseHandlers[this._requestId] = (function(_this) {
             return function(m) {
               if (_this._validResponse(m, command)) {
                 deferred.resolve(m);
