@@ -114,34 +114,44 @@ $(() ->
     @CONNECTION_TYPE = "ide"
     @DEFAULT_TIMEOUT = 5000
     @ERROR_TIMEOUT = -1
+    @MAX_REQUEST_ID = 10000
 
     constructor: () ->
+      @_requestId = 0
       @_user = new User()
       @_eventHandlers = {}
       @_izanagiWebSocket = new IzanagiWebSocket(
         (msg) =>
-          if msg.command of @_eventHandlers
-            @_eventHandlers[msg.command](msg)
-            delete @_eventHandlers[msg.command]
+          if msg.request_id of @_eventHandlers
+            @_eventHandlers[msg.request_id](msg)
+            delete @_eventHandlers[msg.request_id]
           0
         , () ->
           showToast "please reload this web page"
       )
-      @_validResponse = (msg) ->
-        msg.data.result < 100
+      @_validResponse = (msg, command) ->
+        msg.data.result < 100 and msg.command == command + "_RES"
       @_makePacket = (command, data) ->
+        rid = @_requestId
+        @_requestId = (@_requestId + 1) % IzanagiConnection.MAX_REQUEST_ID
         if @_user._sessionId == null
           sid = ""
         else
           sid = @_user._sessionId
-        {type: IzanagiConnection.CONNECTION_TYPE, session_id: sid, command: command + "_REQ", data: data}
+        {
+          type: IzanagiConnection.CONNECTION_TYPE,
+          session_id: sid,
+          command: command + "_REQ",
+          request_id: rid,
+          data: data
+        }
       @_sendCommand = (command, data = {}, timeout = IzanagiConnection.DEFAULT_TIMEOUT) ->
         deferred = $.Deferred()
         timerId = setTimeout(() ->
           deferred.reject(IzanagiConnection.ERROR_TIMEOUT)
         , timeout)
-        @_eventHandlers[command + "_RES"] = (m) =>
-          if @_validResponse m
+        @_eventHandlers[@_requestId] = (m) =>
+          if @_validResponse m, command
             deferred.resolve m
           else
             deferred.reject m.data.result
