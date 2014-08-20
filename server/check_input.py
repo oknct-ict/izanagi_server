@@ -13,6 +13,8 @@ FILE_ID     = myconst.FILE_ID
 FILE_NAME   = myconst.FILE_NAME
 DIR         = myconst.DIR
 CODE        = myconst.CODE
+DEVICE_DATA = myconst.DEVICE_DATA
+DEVICE_ID   = myconst.DEVICE_ID
 LEN         = 0;
 LEN_ALPHA   = 1;
 
@@ -36,6 +38,16 @@ def is_correct_str(string, str_len, case):
             return myconst.DATA_NON_REGULATED;
     return myconst.OK
 
+def input_json(data):
+    if "session_id" not in data or \
+        "request_id" not in data or \
+        "command" not in data or \
+        "data" not in data or \
+        "type" not in data:
+        print "json _ error";
+        return myconst.DATA_DEFICIENCY;
+    return myconst.OK;
+    
 def register(data):
     if USER not in data or \
         PASS not in data or \
@@ -52,6 +64,13 @@ def login(data):
     if USER not in data or PASS not in data:
         return myconst.DATA_DEFICIENCY;
     return myconst.OK;
+
+def login_android(data):
+    if login(data) != myconst.OK or \
+        DEVICE_DATA not in data or \
+        DEVICE_ID not in data[DEVICE_DATA]:
+        return myconst.DATA_DEFICIENCY;
+    return myconst.OK
 
 def pro_create(data):
     if PRO_NAME not in data:
