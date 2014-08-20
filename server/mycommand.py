@@ -14,8 +14,19 @@ Websocketを使ってIDE か Androidに送信をする
 @param command
 @param data
 '''
-def send_websock(websock, connection_type, session_id, command, data):
-    json_data = make_json(connection_type, session_id, command, data);
+def send_websock(websock, connection_type, session_id, request_id, command, data):
+    json_data = make_json(connection_type, session_id, request_id, command, data);
+    print "send:", json_data;
+    websock.send(json_data);
+
+'''
+エラーだった
+@param websock
+@param connection_type
+'''
+def send_json_error(websock, connection_type):
+    json_data = make_json(connection_type, "", "", myconst.JSON_ERROR, {});
+    print "send:", json_data;
     websock.send(json_data);
 
 '''
@@ -26,10 +37,11 @@ def send_websock(websock, connection_type, session_id, command, data):
 @param data
 @return json_data
 '''
-def make_json(connect_type, session_id, command, data):
+def make_json(connect_type, session_id, request_id, command, data):
     json_data = json.dumps({
         "type":connect_type,
         "session_id":session_id,
+        "request_id":request_id,
         "command":command,
         "data":data});
     return json_data;

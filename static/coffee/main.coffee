@@ -10,33 +10,6 @@ $(() ->
     toast = $('<div class="toast fade"><button type="button" class="close" data-dismiss="alert"></button><div class="toast-body"><p>' + text + '</p></div>')
     $("#alerts-container").append(toast.addClass("in"))
 
-  class User
-    constructor: (userId = null, sessionId = null) ->
-      @_userId = userId
-      @_sessionId = sessionId
-    setUser: (userId, sessionId) ->
-      if userId == null
-        if @_userId != null
-          @onLogout @_userId, @_sessionId
-        @_userId = userId
-        @_sessionId = sessionId
-      else if userId != @_userId
-        if @_userId != null
-          @onLogout @_userId, @_sessionId
-        @onLogin userId, sessionId
-        @_userId = userId
-        @_sessionId = sessionId
-      else
-        @_sessionId = sessionId
-    onLogout: () ->
-      0
-    onLogin: () ->
-      0
-  class Project
-    constructor: (@projectId, @projectName) ->
-      0
-    @create: (projectName) ->
-
   class IzanagiWebSocket
     @SERVER_URL = "ws://nado.oknctict.tk:5000/websock/ide/"
     
@@ -52,16 +25,17 @@ $(() ->
 
   class IzanagiConnection
     class User
-      constructor: (@_userId = null, @_sessionId = null) ->
+      constructor: (@userId = null, @sessionId = null) ->
       setUser: (userId, sessionId) ->
-        if @_userId != null
-          @onLogout @_userId, @_sessionId
+        if @userId != null
+          @onLogout @userId, @sessionId
         if userId != null
           @onLogin userId, sessionId
-        @_userId = userId
-        @_sessionId = sessionId
+        @userId = userId
+        @sessionId = sessionId
       onLogout: () ->
       onLogin: () ->
+
     class Project
       @STATE_READY    = 0
       @STATE_CREATING = 1
@@ -110,38 +84,106 @@ $(() ->
         ).fail(() =>
           @state = Project.STATE_EMPTY
         )
+    class File
+      constructor: (@projectId = null, @fileName = "", @dir = "/", @code = "", @fileId = null) ->
+      save: (conn, projectId, fileName, dir, code) ->
+        conn._sendCommand("save", {
+          file_name: fileName,
+          project_id: projectId,
+          dir: dir,
+          code: code,
+        }).done((msg) =>
+          @fileId = msg.data.file_id
+          @fileName = fileName
+          @projectId = projectId
+          @dir = dir
+          @code = code
+        )
+      renew: (conn) ->
+        conn._sendCommand("renew", {
+          file_id: @fileId,
+          code: @code
+        })
+      open: (conn, fileId) ->
+        conn._sendCommand("open", {
+          file_id: fileId
+        }).done((msg) =>
+          @fileId = fileId
+          @code = msg.data.code
+        )
+      getInfo: (conn) ->
+        conn._sendCommand("info", {
+          file_id: @fileId
+        }).done((msg) =>
+          @fileName = msg.data.file_name
+          @dir = msg.data.dir
+          @projectId = msg.data.project_id
+        )
+      delete: (conn) ->
+        conn._sendCommand("delete", {
+          file_id: @fileId
+        }).done((msg) =>
+          @fileId = null
+        )
+      rename: (conn, fileName) ->
+        conn._sendCommand("rename", {
+          file_id: @fileId,
+          file_name: fileName,
+        }).done(() =>
+          @fileName = fileName
+        )
+      redir: (conn, dir) ->
+        conn._sendCommand("redir", {
+          file_id: @fileId,
+          dir: dir
+        }).done(() =>
+          @dir = dir
+        )
 
     @CONNECTION_TYPE = "ide"
     @DEFAULT_TIMEOUT = 5000
     @ERROR_TIMEOUT = -1
+    @MAX_REQUEST_ID = 10000
 
     constructor: () ->
+      @_requestId = 0
       @_user = new User()
+      @_responseHandlers = {}
       @_eventHandlers = {}
       @_izanagiWebSocket = new IzanagiWebSocket(
         (msg) =>
-          if msg.command of @_eventHandlers
+          if msg.request_id of @_responseHandlers
+            @_reponseHandlers[msg.request_id](msg)
+            delete @_reponseHandlers[msg.request_id]
+          else if msg.command of @_eventHandlers
             @_eventHandlers[msg.command](msg)
-            delete @_eventHandlers[msg.command]
           0
         , () ->
           showToast "please reload this web page"
       )
-      @_validResponse = (msg) ->
-        msg.data.result < 100
+      @_validResponse = (msg, command) ->
+        msg.data.result < 100 and msg.command == command + "_RES"
       @_makePacket = (command, data) ->
-        if @_user._sessionId == null
+        rid = @_requestId
+        @_requestId = (@_requestId + 1) % IzanagiConnection.MAX_REQUEST_ID
+        if @_user.sessionId == null
           sid = ""
         else
-          sid = @_user._sessionId
-        {type: IzanagiConnection.CONNECTION_TYPE, session_id: sid, command: command + "_REQ", data: data}
+          sid = @_user.sessionId
+        {
+          type: IzanagiConnection.CONNECTION_TYPE,
+          session_id: sid,
+          command: command + "_REQ",
+          request_id: rid,
+          data: data
+        }
       @_sendCommand = (command, data = {}, timeout = IzanagiConnection.DEFAULT_TIMEOUT) ->
         deferred = $.Deferred()
         timerId = setTimeout(() ->
           deferred.reject(IzanagiConnection.ERROR_TIMEOUT)
         , timeout)
-        @_eventHandlers[command + "_RES"] = (m) =>
-          if @_validResponse m
+        @_responseHandlers[@_requestId] = (m) =>
+          if @_validResponse m, command
             deferred.resolve m
           else
             deferred.reject m.data.result
@@ -203,6 +245,24 @@ $(() ->
       })
     deleteFile: (fileId) ->
       @_sendCommand("delete", {
+        file_id: fileId
+      })
+    getFiles: (projectId) ->
+      @_sendCommand("list", {
+        project_id: projectId
+      })
+    renameFile: (fileId, fileName) ->
+      @_sendCommand("rename", {
+        file_id: fileId,
+        file_name: fileName
+      })
+    redirFile: (fileId, dir) ->
+      @_sendCommand("redir", {
+        file_id: fileId,
+        dir: dir
+      })
+    getFileInfo: (fileId) ->
+      @_sendCommand("info", {
         file_id: fileId
       })
     setOnLogin: (handler) ->
