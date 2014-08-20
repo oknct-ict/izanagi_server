@@ -48,7 +48,7 @@ def websock_ide():
                 mycommand.send_json_error(websock, myconst.IDE);
                 continue;
             # if not first time login
-            if json_data["command"] == myconst.LOGIN or session_id is not None:
+            if json_data["command"] == myconst.LOGIN and session_id is not None:
                 # disconnect
                 CONNECTION_MANAGER.delete(myconst.IDE, session_id);
                 session_id = None;
@@ -80,7 +80,7 @@ def websock_android():
                 continue;
             print json_data
             # if not first time login
-            if json_data["command"] == myconst.LOGIN or session_id is not None:
+            if json_data["command"] == myconst.LOGIN and session_id is not None:
                 # disconnect
                 CONNECTION_MANAGER.delete(myconst.ANDROID, session_id);
                 session_id = None;
