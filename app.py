@@ -23,6 +23,10 @@ def index():
 def test():
     return render_template("test.html");
 
+@app.route("/test2")
+def test2():
+    return render_template("android.html");
+
 '''
 IDEの通信の受け口
 '''
