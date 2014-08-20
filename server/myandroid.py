@@ -42,14 +42,15 @@ def receive_android(websock, session_id, command, data):
 def receive_android_register(websock, data):
     res = check_input.register(data);
     if res != myconst.OK:
-        return ("", res);
+        return (res);
     user_id = data[USER];
     password = data[PASS];
     address = data[MAIL];
     grade = data[GRADE];
     # chech is user_id unique
     if user_manager.check_unique_user_id(user_id) is False:
-        return ("", myconst.USER_EXISTING);
+        return (myconst.USER_EXISTING);
+    user_manager.append(user_id, password, address, grade);
     return (myconst.OK);
 
 def receive_android_login(websock, data):
