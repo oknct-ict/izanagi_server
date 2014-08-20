@@ -9,6 +9,10 @@ $(() ->
   showToast = (text) ->
     toast = $('<div class="toast fade"><button type="button" class="close" data-dismiss="alert"></button><div class="toast-body"><p>' + text + '</p></div>')
     $("#alerts-container").append(toast.addClass("in"))
+  makeError = (error) ->
+    deferred = $.Deferred()
+    deferred.reject error
+    deferred.promise()
 
   class IzanagiWebSocket
     @SERVER_URL = "ws://nado.oknctict.tk:5000/websock/ide/"
@@ -51,9 +55,7 @@ $(() ->
           @state = Project.STATE_READY
       create: (conn) ->
         if @state == Project.STATE_READY
-          deferred = $.Deferred()
-          deferred.reject Project.ERROR_ALREADY_EXISTS
-          deferred.promise()
+          makeError Project.ERROR_ALREADY_EXISTS
         else
           @state = Project.STATE_CREATING
           conn._sendCommand("pro_create", {
@@ -162,7 +164,7 @@ $(() ->
           showToast "please reload this web page"
       )
       @_validResponse = (msg, command) ->
-        msg.data.result < 100 and msg.command == command + "_RES"
+        msg.data.result < 100
       @_makePacket = (command, data) ->
         rid = @_requestId
         @_requestId = (@_requestId + 1) % IzanagiConnection.MAX_REQUEST_ID

@@ -1,6 +1,6 @@
 (function() {
   $(function() {
-    var IzanagiConnection, IzanagiWebSocket, con, editor, showToast;
+    var IzanagiConnection, IzanagiWebSocket, con, editor, makeError, showToast;
     editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
       lineNumbers: true,
       mode: "text/x-vb",
@@ -10,6 +10,12 @@
       var toast;
       toast = $('<div class="toast fade"><button type="button" class="close" data-dismiss="alert"></button><div class="toast-body"><p>' + text + '</p></div>');
       return $("#alerts-container").append(toast.addClass("in"));
+    };
+    makeError = function(error) {
+      var deferred;
+      deferred = $.Deferred();
+      deferred.reject(error);
+      return deferred.promise();
     };
     IzanagiWebSocket = (function() {
       IzanagiWebSocket.SERVER_URL = "ws://nado.oknctict.tk:5000/websock/ide/";
@@ -87,11 +93,8 @@
         }
 
         Project.prototype.create = function(conn) {
-          var deferred;
           if (this.state === Project.STATE_READY) {
-            deferred = $.Deferred();
-            deferred.reject(Project.ERROR_ALREADY_EXISTS);
-            return deferred.promise();
+            return makeError(Project.ERROR_ALREADY_EXISTS);
           } else {
             this.state = Project.STATE_CREATING;
             return conn._sendCommand("pro_create", {
@@ -262,7 +265,7 @@
           return showToast("please reload this web page");
         });
         this._validResponse = function(msg, command) {
-          return msg.data.result < 100 && msg.command === command + "_RES";
+          return msg.data.result < 100;
         };
         this._makePacket = function(command, data) {
           var rid, sid;
