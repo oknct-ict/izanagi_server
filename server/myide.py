@@ -21,7 +21,7 @@ FILE_NAME   = myconst.FILE_NAME
 FILE_LIST   = myconst.FILE_LIST
 DIR         = myconst.DIR
 CODE        = myconst.CODE
-
+DEVICES     = "devices"
 
 '''
 app.pyから呼ばれ、コマンドを見て関数を呼ぶ
@@ -100,6 +100,14 @@ def receive_ide(websock, session_id, command, data):
     elif command == myconst.INFO:
         file_name, directory, project_id, res = receive_ide_info(data);
         data = {RES:res, FILE_NAME:file_name, DIR:directory, PRO_ID:project_id};
+    # who_android
+    elif command == myconst.WHO_ANDROID:
+        devices, res = receive_ide_who_android(user_id, data);
+        data = {RES:res, DEVICES:devices};
+    # run_request
+    elif command == myconst.RUN_REQUEST:
+        res = receive_ide_run_request(data);
+        data = {RES:res};
 
     # response
     print session_id, command, data;
@@ -134,7 +142,7 @@ def receive_ide_login(websock, data):
         # access_point is over 
         return ("", myconst.ACCESS_POINT_OVER);
     # connection 
-    session_id = CONNECTION_MANAGER.append(myconst.IDE, websock, user_id, "");
+    session_id = CONNECTION_MANAGER.append(myconst.IDE, websock, user_id);
     return (session_id, myconst.OK);
 
 def receive_ide_pro_create(user_id, data):

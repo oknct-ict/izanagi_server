@@ -69,6 +69,6 @@ def receive_android_login(websock, data):
         # access_point is over 
         return ("", myconst.ACCESS_POINT_OVER);
     # connection 
-    session_id = CONNECTION_MANAGER.append(myconst.ANDROID, websock, user_id, device_id);
+    session_id = CONNECTION_MANAGER.append(myconst.ANDROID, websock, user_id);
     return (session_id, myconst.OK);
 
