@@ -183,7 +183,7 @@ $(() ->
         {
           type: IzanagiConnection.CONNECTION_TYPE,
           session_id: sid,
-          command: command + "_REQ",
+          command: command,
           request_id: rid,
           data: data
         }

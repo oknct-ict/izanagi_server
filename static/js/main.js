@@ -42,7 +42,7 @@
 
     })();
     IzanagiConnection = (function() {
-      var File, Project, User;
+      var Device, File, Project, User;
 
       User = (function() {
         function User(userId, sessionId) {
@@ -238,6 +238,22 @@
 
       })();
 
+      Device = (function() {
+        function Device(deviceId) {
+          this.deviceId = deviceId;
+        }
+
+        Device.prototype.run = function(conn, code) {
+          return conn._sendCommand("run_request", {
+            device_id: this.deviceId,
+            code: code
+          });
+        };
+
+        return Device;
+
+      })();
+
       IzanagiConnection.CONNECTION_TYPE = "ide";
 
       IzanagiConnection.DEFAULT_TIMEOUT = 5000;
@@ -279,7 +295,7 @@
           return {
             type: IzanagiConnection.CONNECTION_TYPE,
             session_id: sid,
-            command: command + "_REQ",
+            command: command,
             request_id: rid,
             data: data
           };
@@ -418,6 +434,17 @@
       IzanagiConnection.prototype.getFileInfo = function(fileId) {
         return this._sendCommand("info", {
           file_id: fileId
+        });
+      };
+
+      IzanagiConnection.prototype.getDevices = function() {
+        return this._sendCommand("who_android", {});
+      };
+
+      IzanagiConnection.prototype.runReuqest = function(deviceId, code) {
+        return this._sendCommand("run_request", {
+          device_id: deviceId,
+          code: code
         });
       };
 
