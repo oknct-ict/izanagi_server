@@ -50,8 +50,8 @@ class _DeviceManger(object):
     def connection(self, device_id, session_id):
         if self.is_device_id(device_id) is False:
             return False;
-        data = devices[device_id];
-        data.update({IDE:session_i});
+        data = self._devices[device_id];
+        data.update({IDE:session_id});
         self._devices.update({device_id: data});
         return True;
     
@@ -79,7 +79,7 @@ class _DeviceManger(object):
     user_idからdevice_idを求める
 
     '''
-    def get_device_id(self, user_id):
+    def get_device_id_from_user_id(self, user_id):
         device_ids = []
         for device_id in self._devices:
             if self._devices[device_id][USER] == user_id:
@@ -87,15 +87,33 @@ class _DeviceManger(object):
         return device_ids;
 
     '''
-    user_idからdevice_idを求める
+    androidのsession_idからdevice_idを求める
 
     '''
-    def get_session_id(self, device_id):
+    def get_device_id_from_android(self, android):
+        for device_id in self._devices:
+            if self._devices[device_id][ANDROID] == android:
+                return device_id;
+        return None;
+
+    
+    '''
+    device_idからsession_id(Android)を求める
+
+    '''
+    def get_session_android(self, device_id):
         if self.is_device_id(device_id) is False:
             return None;
         return self._devices[device_id][ANDROID];
 
+    '''
+    device_idからsession_id(IDE)を求める
 
+    '''
+    def get_session_ide(self, device_id):
+        if self.is_device_id(device_id) is False:
+            return None;
+        return self._devices[device_id][IDE];
 
 DEVICE_MANAGER = _DeviceManger()
 

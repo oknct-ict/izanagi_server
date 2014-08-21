@@ -290,7 +290,7 @@ def receive_ide_info(data):
     return (file_name, directory, project_id, myconst.OK);
 
 def receive_ide_who_android(user_id):
-    device_ids = DEVICE_MANAGER.get_device_id(user_id);
+    device_ids = DEVICE_MANAGER.get_device_id_from_user_id(user_id);
     devices = [];
     for device in device_ids:
         devices.append({DEVICE_ID:device});
@@ -309,7 +309,7 @@ def receive_ide_run_request(data, session_id):
     return (res);
 
 def send_run_request(device_id, code, ide_session_id):
-    session_id = DEVICE_MANAGER.get_session_id(device_id);
+    session_id = DEVICE_MANAGER.get_session_android(device_id);
     websock = CONNECTION_MANAGER.get_connection(ANDROID, session_id);
     if session_id is None or websock is None:
         return (myconst.USER_NO_EXISTING);
