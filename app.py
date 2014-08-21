@@ -15,6 +15,9 @@ import server.check_input as check_input
 from server.device_manager import DEVICE_MANAGER
 from server.connection_manager import CONNECTION_MANAGER
 
+IDE     = myconst.IDE
+ANDROID = myconst.ANDROID
+
 app = Flask(__name__);
 
 @app.route('/')
@@ -46,19 +49,21 @@ def websock_ide():
             # check json form
             if check_input.input_json(json_data) is not myconst.OK:
                 # not correct
-                mycommand.send_json_error(websock, myconst.IDE);
+                mycommand.send_json_error(websock, IDE);
                 continue;
             # if not first time login
             if json_data["command"] == myconst.LOGIN and session_id is not None:
                 # disconnect
-                CONNECTION_MANAGER.delete(myconst.IDE, session_id);
+                CONNECTION_MANAGER.delete(IDE, session_id);
+                DEVICE_MANAGER.delete_session_id(IDE, session_id);
                 session_id = None;
             session_id, request_id, command, data = get_json(json_data);
             session_id, data = myide.receive_ide(websock, session_id, command, data);
-            mycommand.send_websock(websock, myconst.IDE, session_id, request_id, command, data);
+            mycommand.send_websock(websock, IDE, session_id, request_id, command, data);
             print "ide:websock", websock;
     # sessin_id exist => disconnect
-    CONNECTION_MANAGER.delete(myconst.IDE, session_id);
+    CONNECTION_MANAGER.delete(IDE, session_id);
+    DEVICE_MANAGER.delete_session_id(IDE, session_id);
     return "Disconnect";
 
 '''
@@ -77,22 +82,22 @@ def websock_android():
             # check json form
             if check_input.input_json(json_data) is not myconst.OK:
                 # not correct
-                mycommand.send_json_error(websock, myconst.ANDROID);
+                mycommand.send_json_error(websock, ANDROID);
                 continue;
             print json_data
             # if not first time login
             if json_data["command"] == myconst.LOGIN and session_id is not None:
                 # disconnect
-                CONNECTION_MANAGER.delete(myconst.ANDROID, session_id);
-                DEVICE_MANAGER.delete_session_id(session_id);
+                CONNECTION_MANAGER.delete(ANDROID, session_id);
+                DEVICE_MANAGER.delete_session_id(ANDROID, session_id);
                 session_id = None;
             session_id, request_id, command, data = get_json(json_data);
             session_id, command, data = myandroid.receive_android(websock, session_id, command, data);
-            mycommand.send_websock(websock, myconst.ANDROID, session_id, request_id, command, data);
+            mycommand.send_websock(websock, ANDROID, session_id, request_id, command, data);
             print;
     # sessin_id exist => disconnect
-    CONNECTION_MANAGER.delete(myconst.ANDROID, session_id);
-    DEVICE_MANAGER.delete_session_id(session_id);
+    CONNECTION_MANAGER.delete(ANDROID, session_id);
+    DEVICE_MANAGER.delete_session_id(ANDROID, session_id);
     return "Disconnect";
 
 '''
