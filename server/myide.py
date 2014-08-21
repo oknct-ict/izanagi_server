@@ -52,7 +52,7 @@ def receive_ide(websock, session_id, command, data):
     else:
         if CONNECTION_MANAGER.is_valid_websocket(myconst.IDE, session_id, websock) is False:
             # not correct 
-            return (None, None, None);   
+            return (None, None);   
     
     # get user_id from session_id
     user_id = CONNECTION_MANAGER.get_user_id(myconst.IDE, session_id);
