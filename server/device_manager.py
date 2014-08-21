@@ -77,10 +77,9 @@ class _DeviceManger(object):
     IDEとAndroidがコネクションを張っているのか
     '''
     def is_connection_ide(self, device_id):
-        if self.is_device_id(device_id) is False:
-            return False;
-        if IDE in self._devices[device_id]:
-            return True;
+        if self.is_device_id(device_id):
+            if IDE in self._devices[device_id]:
+                return True;
         return False;
     
     '''
@@ -129,9 +128,9 @@ class _DeviceManger(object):
 
     '''
     def get_session_ide(self, device_id):
-        if self.is_device_id(device_id) is False:
-            return None;
-        return self._devices[device_id][IDE];
+        if self.is_connection_ide(device_id):
+            return self._devices[device_id][IDE];
+        return None;
 
     def output(self):
         print self._devices;

@@ -16,6 +16,7 @@ DIR         = myconst.DIR
 CODE        = myconst.CODE
 DEVICE_DATA = myconst.DEVICE_DATA
 DEVICE_ID   = myconst.DEVICE_ID
+LOG         = myconst.LOG
 LEN         = 0;
 LEN_ALPHA   = 1;
 
@@ -149,5 +150,15 @@ def run_request(data):
 def run_start(data):
     if RES not in data:
         return myconst.DATA_DEFICIENCY;
+    return myconst.OK;
+
+def log_android(data):
+    if LOG not in data:
+        return myconst.DATA_DEFICIENCY;
+    return myconst.OK;
+
+def run_end(data):
+    if RES not in data or DEVICE_ID not in data:
+        return myconst.DATA_DEFICIENCY
     return myconst.OK;
 

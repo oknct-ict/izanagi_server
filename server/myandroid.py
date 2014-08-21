@@ -94,17 +94,17 @@ def send_to_ide(session_id, command, data):
     # get device_id
     device_id = DEVICE_MANAGER.get_device_id_from_android(session_id);
     if device_id is None:
-        print myconst.RUN_START, myconst.SESSION_ID_NO_EXISTING;
+        print myconst.SESSION_ID_NO_EXISTING;
         return;
     # get session_id
     session_id = DEVICE_MANAGER.get_session_ide(device_id);
     if session_id is None:
-        print myconst.RUN_START, myconst.DEVICE_ID_NO_EXISTING;
+        print myconst.DEVICE_ID_NO_EXISTING;
         return;
     # get websock 
     websock = CONNECTION_MANAGER.get_connection(IDE, session_id);
     if websock is None:
-        print myconst.RUN_START, myconst.SESSION_ID_NO_EXISTING;
+        print myconst.SESSION_ID_NO_EXISTING;
         return;
     # send to ide
     mycommand.send_websock(websock, IDE, session_id, mycommand.get_request_id(), command, data);
@@ -118,10 +118,12 @@ def receive_android_run_start(session_id, data):
     
 def receive_android_log(session_id, data):
     # format check
-    res = check_input.andloid_log(data);
+    res = check_input.log_android(data);
     if res != myconst.OK:
         print myconst.LOG_ANDROID, res;
-    # 
+    device_id = DEVICE_MANAGER.get_device_id_from_android(session_id);
+    data.update({DEVICE_ID:device_id});
+    send_to_ide(session_id, myconst.LOG_IDE, data); 
 
 def receive_android_run_end(session_id, data):
     print True;

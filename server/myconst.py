@@ -19,6 +19,7 @@ CODE        = "code"
 DEVICE_DATA = "device_data"
 DEVICE_ID   = "device_id"
 JSON_ERROR  = "json_format_error"
+LOG         = "log"
 
 # result
 OK = 0
