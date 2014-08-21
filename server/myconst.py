@@ -45,6 +45,7 @@ RUN_END_IDE     = "run_end_ide"
 RUN_START       = "run_start"
 LOG_ANDROID     = "log_android"
 RUN_END_ANDROID = "run_end_android"
+NO_SEND         = "no_send"
 
 # error
 USER_DATA_FAULT     = 100

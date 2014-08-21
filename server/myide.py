@@ -111,12 +111,12 @@ def receive_ide(websock, session_id, command, data):
         data = {RES:res, DEVICES:devices};
     # run_request
     elif command == myconst.RUN_REQUEST:
-        res = receive_ide_run_request(data);
+        res = receive_ide_run_request(data, session_id);
         data = {RES:res};
 
     # response
     print session_id, command, data;
-    return (session_id, command, data);
+    return (session_id, data);
 
 def receive_ide_register(websock, data):
     res = check_input.register(data);
@@ -296,24 +296,28 @@ def receive_ide_who_android(user_id):
         devices.append({DEVICE_ID:device});
     return (devices, myconst.OK);
 
-def receive_ide_run_request(data):
+def receive_ide_run_request(data, session_id):
     res = check_input.run_request(data);
     if res != myconst.OK:
         return (res);
+    print "ko";
     device_id = data[DEVICE_ID];
     code = data[CODE];
     if DEVICE_MANAGER.is_device_id(device_id) is False:
         return (myconst.DEVICE_ID_NO_EXISTING);
-    res = send_run_request(device_id, code);
+    res = send_run_request(device_id, code, session_id);
     return (res);
 
-def send_run_request(device_id, code):
+def send_run_request(device_id, code, ide_session_id):
     session_id = DEVICE_MANAGER.get_session_id(device_id);
     websock = CONNECTION_MANAGER.get_connection(ANDROID, session_id);
     if session_id is None or websock is None:
         return (myconst.USER_NO_EXISTING);
+    if DEVICE_MANAGER.connection(device_id, ide_session_id) is False:
+        return (myconst.DEVICE_ID_NO_EXISTING);
     request_id = mycommand.get_request_id();
     data = {CODE:code};
+    print "kokomadekitayo";
     mycommand.send_websock(websock, ANDROID, session_id, request_id, myconst.RUN_START, data);
     return (myconst.OK);
 

@@ -2,11 +2,14 @@
 #coding:utf-8
 
 import myconst
+import mycommand
 import user_manager
 import check_input
 from connection_manager import CONNECTION_MANAGER
 from device_manager import DEVICE_MANAGER
 
+IDE         = myconst.IDE
+ANDROID     = myconst.ANDROID
 USER        = myconst.USER 
 PASS        = myconst.PASS
 MAIL        = myconst.MAIL
@@ -35,6 +38,10 @@ def receive_android(websock, session_id, command, data):
     if command == myconst.LOGIN:
         session_id, res = receive_android_login(websock, data);
         data = {RES:res}
+    # run_start (respnse)
+    if command == myconst.RUN_START:
+        res = receive_android_run_start(session_id, data);
+        command = myconst.NO_SEND;
 
     # response
     print session_id, command, data;
@@ -75,3 +82,20 @@ def receive_android_login(websock, data):
     DEVICE_MANAGER.append(device_id, user_id, session_id);
     return (session_id, myconst.OK);
 
+def receive_android_run_start(session_id, data):
+    res = check_input.run_start(data);
+    if res != myconst.OK:
+        return (res);
+    device_id = DEVICE_MANAGER.get_device_id_from_android(session_id);
+    if device_id is None:
+        return (myconst.SESSION_ID_NO_EXISTING);
+    session_id = DEVICE_MANAGER.get_session_ide(device_id);
+    if session_id is None:
+        return (myconst.DEVICE_ID_NO_EXISTING);
+    websock = CONNECTION_MANAGER.get_connection(IDE, session_id);
+    if websock is None:
+        return (myconst.SESSION_ID_NO_EXISTING);
+    mycommand.send_websock(websock, IDE, session_id, mycommand.get_request_id(), myconst.SENDED_CODE, data);
+    print "run_start[android -> ide]";
+    return (myconst.OK);
+    

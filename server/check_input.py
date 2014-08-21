@@ -7,6 +7,7 @@ USER    = myconst.USER
 PASS    = myconst.PASS
 MAIL    = myconst.MAIL
 GRADE   = myconst.GRADE
+RES     = myconst.RES
 PRO_ID  = myconst.PRO_ID
 PRO_NAME= myconst.PRO_NAME
 FILE_ID     = myconst.FILE_ID
@@ -144,4 +145,9 @@ def run_request(data):
     if CODE not in data or DEVICE_ID not in data:
         return myconst.DATA_DEFICIENCY;
     return myconst.OK
+
+def run_start(data):
+    if RES not in data:
+        return myconst.DATA_DEFICIENCY;
+    return myconst.OK;
 

@@ -54,9 +54,9 @@ def websock_ide():
                 CONNECTION_MANAGER.delete(myconst.IDE, session_id);
                 session_id = None;
             session_id, request_id, command, data = get_json(json_data);
-            session_id, command, data = myide.receive_ide(websock, session_id, command, data);
+            session_id, data = myide.receive_ide(websock, session_id, command, data);
             mycommand.send_websock(websock, myconst.IDE, session_id, request_id, command, data);
-            print;
+            print "ide:websock", websock;
     # sessin_id exist => disconnect
     CONNECTION_MANAGER.delete(myconst.IDE, session_id);
     return "Disconnect";

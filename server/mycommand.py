@@ -15,6 +15,9 @@ Websocketを使ってIDE か Androidに送信をする
 @param data
 '''
 def send_websock(websock, connection_type, session_id, request_id, command, data):
+    if command is myconst.NO_SEND:
+        print "no send";
+        return;
     json_data = make_json(connection_type, session_id, request_id, command, data);
     print "send:", json_data;
     websock.send(json_data);
