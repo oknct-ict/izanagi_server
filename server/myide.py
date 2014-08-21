@@ -51,7 +51,7 @@ def receive_ide(websock, session_id, command, data):
         data = {RES:res}
     # session_id whether correct websock?
     else:
-        if CONNECTION_MANAGER.is_valid_websocket(myconst.IDE, session_id, websock) is False:
+        if CONNECTION_MANAGER.is_valid_websocket(myconst.IDE, session_id, websock) == False:
             # not correct 
             return (None, None);   
     
@@ -128,7 +128,7 @@ def receive_ide_register(websock, data):
     address = data[MAIL];
     grade = data[GRADE];
     # check is user_id unique
-    if user_manager.check_unique_user_id(user_id) is False:
+    if user_manager.check_unique_user_id(user_id) == False:
         return (myconst.USER_EXISTING);
     user_manager.append(user_id, password, address, grade);
     return (myconst.OK);
@@ -140,11 +140,11 @@ def receive_ide_login(websock, data):
     user_id = data[USER];
     password = data[PASS];
     # userdata check
-    if user_manager.is_valid_user_id(user_id, password) is False:
+    if user_manager.is_valid_user_id(user_id, password) == False:
         # no user data 
         return ("", myconst.USER_DATA_FAULT);
     # access_point num check
-    if CONNECTION_MANAGER.possible_append(myconst.IDE, user_id) is False:
+    if CONNECTION_MANAGER.possible_append(myconst.IDE, user_id) == False:
         # access_point is over 
         return ("", myconst.ACCESS_POINT_OVER);
     # connection 
@@ -157,7 +157,7 @@ def receive_ide_pro_create(user_id, data):
         return ("", res);
     project_name = data[PRO_NAME];
     # check is project_name unique
-    if project_manager.check_unique_project_name(user_id, project_name) is False:
+    if project_manager.check_unique_project_name(user_id, project_name) == False:
         return ("", myconst.PROJECT_EXISTING);
     # project create
     project_id = project_manager.create(user_id, project_name);
@@ -169,7 +169,7 @@ def receive_ide_pro_delete(user_id, data):
         return ("", res);
     project_id = data[PRO_ID];
     # check is project_id
-    if project_manager.is_valid_project_id(user_id, project_id) is False:
+    if project_manager.is_valid_project_id(user_id, project_id) == False:
         return (myconst.PROJECT_NO_EXISTING);
     project_manager.delete(project_id);
     return (myconst.OK);
@@ -181,9 +181,9 @@ def receive_ide_pro_rename(user_id, data):
     project_id = data[PRO_ID];
     project_name = data[PRO_NAME];
     # check is project_id
-    if project_manager.is_valid_project_id(user_id, project_id) is False:
+    if project_manager.is_valid_project_id(user_id, project_id) == False:
         return (myconst.PROJECT_NO_EXISTING);
-    if project_manager.check_unique_project_name(user_id, project_name) is False:
+    if project_manager.check_unique_project_name(user_id, project_name) == False:
         return (myconst.PROJECT_EXISTING);
     project_manager.rename(project_id, project_name);
     return (myconst.OK);
@@ -201,10 +201,10 @@ def receive_ide_save(user_id, data):
     directory = data[DIR];
     code = data[CODE];
     # check use_id and project_id
-    if project_manager.is_valid_project_id(user_id, project_id) is False:
+    if project_manager.is_valid_project_id(user_id, project_id) == False:
         return ("", myconst.PROJECT_NO_EXISTING);
     # check is file_name unique
-    if file_manager.check_unique_file_name(project_id, file_name) is False:
+    if file_manager.check_unique_file_name(project_id, file_name) == False:
         return ("", myconst.FILE_EXISTING);
     # file create
     file_id = file_manager.save(file_name, project_id, directory, code);
@@ -217,7 +217,7 @@ def receive_ide_renew(data):
     file_id = data[FILE_ID];
     code = data[CODE];
     # check is file id
-    if file_manager.is_valid_file_id(file_id) is False:
+    if file_manager.is_valid_file_id(file_id) == False:
         return (myconst.FILE_NO_EXISTING);
     file_manager.renew(file_id, code);
     return (myconst.OK);
@@ -228,7 +228,7 @@ def receive_ide_open(data):
         return ("", res);
     file_id = data[FILE_ID];
     # check is file id
-    if file_manager.is_valid_file_id(file_id) is False:
+    if file_manager.is_valid_file_id(file_id) == False:
         return ("", myconst.FILE_NO_EXISTING);
     code = file_manager._open(file_id);
     return (code, myconst.OK);
@@ -239,7 +239,7 @@ def receive_ide_delete(data):
         return (res);
     file_id = data[FILE_ID];
     # check is file id
-    if file_manager.is_valid_file_id(file_id) is False:
+    if file_manager.is_valid_file_id(file_id) == False:
         return (myconst.FILE_NO_EXISTING);
     file_manager.delete(file_id);
     return (myconst.OK);
@@ -250,7 +250,7 @@ def receive_ide_list(user_id, data):
         return ({}, res);
     project_id = data[PRO_ID];
     # check use_id and project_id
-    if project_manager.is_valid_project_id(user_id, project_id) is False:
+    if project_manager.is_valid_project_id(user_id, project_id) == False:
         return ({}, myconst.PROJECT_NO_EXISTING);
     file_lists, res = file_manager.get_lists(project_id);
     return (file_lists, res);
@@ -262,7 +262,7 @@ def receive_ide_rename(data):
     file_id = data[FILE_ID];
     file_name = data[FILE_NAME];
     # check is file id
-    if file_manager.is_valid_file_id(file_id) is False:
+    if file_manager.is_valid_file_id(file_id) == False:
         return (myconst.FILE_NO_EXISTING);
     file_manager.rename(file_id, file_name);
     return (myconst.OK);
@@ -274,7 +274,7 @@ def receive_ide_redir(data):
     file_id = data[FILE_ID];
     directory = data[DIR];
     # check is file id
-    if file_manager.is_valid_file_id(file_id) is False:
+    if file_manager.is_valid_file_id(file_id) == False:
         return (myconst.FILE_NO_EXISTING);
     file_manager.redir(file_id, directory);
     return (myconst.OK);
@@ -285,7 +285,7 @@ def receive_ide_info(data):
         return ("", "", "", res);
     file_id = data[FILE_ID];
     # check is file id
-    if file_manager.is_valid_file_id(file_id) is False:
+    if file_manager.is_valid_file_id(file_id) == False:
         return ("", "", "", myconst.FILE_NO_EXISTING);
     file_name, directory, project_id = file_manager.info(file_id);
     return (file_name, directory, project_id, myconst.OK);
@@ -306,7 +306,7 @@ def receive_ide_run_request(data, session_id):
     device_id = data[DEVICE_ID];
     code = data[CODE];
     # is alive device_id
-    if DEVICE_MANAGER.is_device_id(device_id) is False:
+    if DEVICE_MANAGER.is_device_id(device_id) == False:
         return (myconst.DEVICE_ID_NO_EXISTING); 
     # device_id is alive, send request
     res = send_run_request(device_id, code, session_id);
@@ -320,7 +320,7 @@ def send_run_request(device_id, code, ide_session_id):
     if session_id is None or websock is None:
         return (myconst.USER_NO_EXISTING);
     # whether connected device_id and ide_session_id
-    if DEVICE_MANAGER.connection(device_id, ide_session_id) is False:
+    if DEVICE_MANAGER.connection(device_id, ide_session_id) == False:
         return (myconst.DEVICE_ID_NO_EXISTING);
     # send prepare
     request_id = mycommand.get_request_id();

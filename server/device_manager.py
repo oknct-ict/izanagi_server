@@ -44,10 +44,11 @@ class _DeviceManger(object):
     指定したデバイスIDで、辞書の中身を消去する
     '''
     def delete(self, connection_type, device_id):
-        if connection_type is ANDROID:
-            print "delete_android  go";
+        if connection_type == ANDROID:
+            print "delete_android  go:", device_id;
             self.delete_android(device_id);
         else:
+            print "delete_ide go:", device_id;
             self.delete_ide(device_id);
 
     '''
@@ -56,8 +57,7 @@ class _DeviceManger(object):
     def delete_session_id(self, connection_type, session_id):
         for device_id in self._devices:
             if connection_type in self._devices[device_id]:
-                if self._devices[device_id][connection_type] is session_id:
-                    print "deletre_session_id", connection_type, session_id;
+                if self._devices[device_id][connection_type] == session_id:
                     self.delete(connection_type, device_id);
                     return True;
         return False;
@@ -75,7 +75,7 @@ class _DeviceManger(object):
     IDEとAndroidがコネクションを張る
     '''
     def connection(self, device_id, session_id):
-        if self.is_device_id(device_id) is False:
+        if self.is_device_id(device_id) == False:
             return False;
         if self.is_connection_ide(device_id):
             return False;
@@ -89,7 +89,7 @@ class _DeviceManger(object):
 
     '''
     def disconnection(self, device_id):
-        if self.is_connection_ide(device_id) is False:
+        if self.is_connection_ide(device_id) == False:
             return False;
         del self._devices[device_id][IDE];
         return True;
@@ -121,7 +121,7 @@ class _DeviceManger(object):
 
     '''
     def get_session_android(self, device_id):
-        if self.is_device_id(device_id) is False:
+        if self.is_device_id(device_id) == False:
             return None;
         return self._devices[device_id][ANDROID];
 

@@ -64,7 +64,7 @@ def receive_android_register(websock, data):
     address = data[MAIL];
     grade = data[GRADE];
     # chech is user_id unique
-    if user_manager.check_unique_user_id(user_id) is False:
+    if user_manager.check_unique_user_id(user_id) == False:
         return (myconst.USER_EXISTING);
     user_manager.append(user_id, password, address, grade);
     return (myconst.OK);
@@ -77,11 +77,11 @@ def receive_android_login(websock, data):
     password = data[PASS];
     device_id = data[DEVICE_DATA][DEVICE_ID];
     # userdata check
-    if user_manager.is_valid_user_id(user_id, password) is False:
+    if user_manager.is_valid_user_id(user_id, password) == False:
         # no user data 
         return ("", myconst.USER_DATA_FAULT);
     # access_point num check
-    if CONNECTION_MANAGER.possible_append(myconst.ANDROID, user_id) is False:
+    if CONNECTION_MANAGER.possible_append(myconst.ANDROID, user_id) == False:
         # access_point is over 
         return ("", myconst.ACCESS_POINT_OVER);
     # connection 

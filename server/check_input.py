@@ -35,7 +35,7 @@ def is_correct_str(string, str_len, case):
         return myconst.DATA_NON_REGULATED;
     # char code check
     if case == LEN_ALPHA:
-        if string.isalnum() is False:
+        if string.isalnum() == False:
             print string, "alfa num not error!";
             return myconst.DATA_NON_REGULATED;
     return myconst.OK

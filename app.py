@@ -47,7 +47,7 @@ def websock_ide():
             json_data = json.loads(data);
             print json_data
             # check json form
-            if check_input.input_json(json_data) is not myconst.OK:
+            if check_input.input_json(json_data) != myconst.OK:
                 # not correct
                 mycommand.send_json_error(websock, IDE);
                 continue;
@@ -82,7 +82,7 @@ def websock_android():
                 break;
             json_data = json.loads(data);
             # check json form
-            if check_input.input_json(json_data) is not myconst.OK:
+            if check_input.input_json(json_data) != myconst.OK:
                 # not correct
                 mycommand.send_json_error(websock, ANDROID);
                 continue;
@@ -101,7 +101,7 @@ def websock_android():
             print "connections";
             CONNECTION_MANAGER.output(ANDROID);
             print;
-    # sessin_id exist => disconnect
+    # session_id exist => disconnect
     DEVICE_MANAGER.delete_session_id(ANDROID, session_id);
     CONNECTION_MANAGER.delete(ANDROID, session_id);
     return "Disconnect";
