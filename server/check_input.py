@@ -7,6 +7,7 @@ USER    = myconst.USER
 PASS    = myconst.PASS
 MAIL    = myconst.MAIL
 GRADE   = myconst.GRADE
+RES     = myconst.RES
 PRO_ID  = myconst.PRO_ID
 PRO_NAME= myconst.PRO_NAME
 FILE_ID     = myconst.FILE_ID
@@ -15,6 +16,7 @@ DIR         = myconst.DIR
 CODE        = myconst.CODE
 DEVICE_DATA = myconst.DEVICE_DATA
 DEVICE_ID   = myconst.DEVICE_ID
+LOG         = myconst.LOG
 LEN         = 0;
 LEN_ALPHA   = 1;
 
@@ -33,7 +35,7 @@ def is_correct_str(string, str_len, case):
         return myconst.DATA_NON_REGULATED;
     # char code check
     if case == LEN_ALPHA:
-        if string.isalnum() is False:
+        if string.isalnum() == False:
             print string, "alfa num not error!";
             return myconst.DATA_NON_REGULATED;
     return myconst.OK
@@ -57,7 +59,7 @@ def register(data):
     if is_correct_str(data[USER], 16, LEN_ALPHA) != myconst.OK or \
         is_correct_str(data[PASS], 32, LEN_ALPHA) != myconst.OK or \
         is_correct_str(data[MAIL], 64, LEN) != myconst.OK:
-        return myconnst.DATA_NON_REGULATED;
+        return myconst.DATA_NON_REGULATED;
     return myconst.OK;
 
 def login(data):
@@ -138,5 +140,25 @@ def redir(data):
 def info(data):
     if FILE_ID not in data:
         return myconst.DATA_DEFICIENCY;
+    return myconst.OK;
+
+def run_request(data):
+    if CODE not in data or DEVICE_ID not in data:
+        return myconst.DATA_DEFICIENCY;
+    return myconst.OK
+
+def run_start(data):
+    if RES not in data:
+        return myconst.DATA_DEFICIENCY;
+    return myconst.OK;
+
+def log_android(data):
+    if LOG not in data:
+        return myconst.DATA_DEFICIENCY;
+    return myconst.OK;
+
+def run_end(data):
+    if RES not in data or DEVICE_ID not in data:
+        return myconst.DATA_DEFICIENCY
     return myconst.OK;
 

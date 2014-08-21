@@ -15,6 +15,9 @@ Websocketを使ってIDE か Androidに送信をする
 @param data
 '''
 def send_websock(websock, connection_type, session_id, request_id, command, data):
+    if command == myconst.NO_SEND:
+        print "no send";
+        return;
     json_data = make_json(connection_type, session_id, request_id, command, data);
     print "send:", json_data;
     websock.send(json_data);
@@ -67,4 +70,13 @@ def get_random_str(length):
 '''
 def get_sha256(string):
     return hashlib.sha256(string).hexdigest();
+
+
+'''
+リクエストIDを生成する
+@return             Int型
+'''
+def get_request_id():
+    return random.randint(0, 2 ** 31);
+    
 

@@ -12,13 +12,12 @@ import connection_types
 
 USER = myconst.USER
 CONN = myconst.CONN
-DEVICE_ID = myconst.DEVICE_ID
 LIMIT_CONNECTION_NUM = 3
 
 
 '''
 IDE⇔サーバ、Android⇔サーバ の通信を管理する。
-@インスタンス変数 _connections[connection_type]{}    キー：セッションID、値：ユーザーID、Websocket、デバイスID
+@インスタンス変数 _connections[connection_type]{}    キー：セッションID、値：ユーザーID、Websocket
 @インスタンス変数 _connection_count[connection_type]{}   キー：ユーザーID、値：そのユーザーは現在同時に何個ログインしているのか
 connection_type はandroid かideが入る
 
@@ -40,13 +39,12 @@ class _ConnectionManager(object):
     @param connection_type      android か ide
     @param connection           実際に通信で使うwebsocket
     @param user_id              ユーザーID
-    @param device_id            デバイスID（端末の固有ID)
     @return session_id          セッションID
     '''
     @connection_types.validater(1)
-    def append(self, connection_type, connection, user_id, device_id):
+    def append(self, connection_type, connection, user_id):
         session_id = mycommand.get_random_str(16);
-        self._connections[connection_type].update({session_id: {USER:user_id, CONN:connection, DEVICE_ID:device_id}});
+        self._connections[connection_type].update({session_id: {USER:user_id, CONN:connection}});
         # user already connectioned 
         if user_id in self._connection_count[connection_type]:
             count = self._connection_count[connection_type][user_id] + 1;
@@ -54,7 +52,6 @@ class _ConnectionManager(object):
         # first time connectioned
         else:
             self._connection_count[connection_type].update({user_id:1});
-        print user_id, self._connection_count[connection_type][user_id];
         return session_id;
         
     '''
@@ -75,8 +72,6 @@ class _ConnectionManager(object):
             self._connection_count[connection_type][user_id] = count - 1;
         # connection delete
         del self._connections[connection_type][session_id];
-        print "now connected list";
-        self.output(connection_type);
         return;
         
     '''
@@ -126,9 +121,7 @@ class _ConnectionManager(object):
         keys = self._connections[connection_type].keys()
         for key in keys:
             if session_id == key:
-                print "session_id is exist";
                 return self._connections[connection_type][key][CONN];
-        print "session_id is not exist";
         return None;
         
     '''
@@ -143,26 +136,7 @@ class _ConnectionManager(object):
         keys = self._connections[connection_type].keys()
         for key in keys:
             if session_id == key:
-                print "get connection is ok.", self._connections[connection_type][key][USER];
                 return self._connections[connection_type][key][USER];
-        print "session_id is not exist";
-        return None;
-
-    '''
-    セッションIDからdevice_idを求める
-    @param connection_type      android か ide
-    @param session_id           セッションID
-    @return 存在するセッションID:device_id、存在しない：None
-
-    '''
-    @connection_types.validater(1)
-    def get_device_id(self, connection_type, session_id):
-        keys = self._connections[connection_type].keys()
-        for key in keys:
-            if session_id == key:
-                print "get device_id is ok.", self._connections[connection_type][key][DEVICE_ID];
-                return self._connections[connection_type][key][DEVICE_ID];
-        print "session_id is not exist";
         return None;
 
     '''

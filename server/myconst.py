@@ -19,6 +19,7 @@ CODE        = "code"
 DEVICE_DATA = "device_data"
 DEVICE_ID   = "device_id"
 JSON_ERROR  = "json_format_error"
+LOG         = "log"
 
 # result
 OK = 0
@@ -38,15 +39,26 @@ LIST            = "list"
 RENAME          = "rename"
 REDIR           = "redir"
 INFO            = "info"
+WHO_ANDROID     = "who_android"
+RUN_REQUEST     = "run_request"
+SENDED_CODE     = "sended_code"
+LOG_IDE         = "log_ide"
+RUN_END_IDE     = "run_end_ide"
+RUN_START       = "run_start"
+LOG_ANDROID     = "log_android"
+RUN_END_ANDROID = "run_end_android"
+NO_SEND         = "no_send"
 
 # error
 USER_DATA_FAULT     = 100
 ACCESS_POINT_OVER   = 101
 USER_EXISTING       = 110
+USER_NO_EXISTING    = 111
 PROJECT_EXISTING    = 120
 PROJECT_NO_EXISTING = 121
 FILE_EXISTING       = 130
 FILE_NO_EXISTING    = 131 
+DEVICE_ID_NO_EXISTING = 140
 FORMAT_INCORRECT    = 200
 DATA_DEFICIENCY     = 201
 DATA_NON_REGULATED  = 202

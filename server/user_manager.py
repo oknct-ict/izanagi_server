@@ -22,10 +22,8 @@ def append(user_id, password, mail, grade):
 '''
 def check_unique_user_id(user_id):
     if g.db.users.find_one({USER:user_id}) is None:
-        print user_id, "new user"
         # uesr_id is unique
         return True;
-    print user_id, "already user"
     # user_id is already register
     return False;
     
@@ -38,9 +36,7 @@ DBに入っているユーザーIDとパスワードと一致するかどうか
 def is_valid_user_id(user_id, password):
     pass_sha256 = mycommand.get_sha256(password);
     if g.db.users.find_one({USER:user_id, PASS:pass_sha256}) is None:
-        print user_id, password, pass_sha256,  "no_user"
         return False;
-    print user_id, "user data correct."
     return True;
 
 

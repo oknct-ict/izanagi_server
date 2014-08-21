@@ -1,6 +1,6 @@
 (function() {
   $(function() {
-    var IzanagiConnection, IzanagiWebSocket, con, editor, showToast;
+    var IzanagiConnection, IzanagiWebSocket, con, editor, makeError, showToast;
     editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
       lineNumbers: true,
       mode: "text/x-vb",
@@ -10,6 +10,12 @@
       var toast;
       toast = $('<div class="toast fade"><button type="button" class="close" data-dismiss="alert"></button><div class="toast-body"><p>' + text + '</p></div>');
       return $("#alerts-container").append(toast.addClass("in"));
+    };
+    makeError = function(error) {
+      var deferred;
+      deferred = $.Deferred();
+      deferred.reject(error);
+      return deferred.promise();
     };
     IzanagiWebSocket = (function() {
       IzanagiWebSocket.SERVER_URL = "ws://nado.oknctict.tk:5000/websock/ide/";
@@ -36,7 +42,7 @@
 
     })();
     IzanagiConnection = (function() {
-      var File, Project, User;
+      var Device, File, Project, User;
 
       User = (function() {
         function User(userId, sessionId) {
@@ -87,11 +93,8 @@
         }
 
         Project.prototype.create = function(conn) {
-          var deferred;
           if (this.state === Project.STATE_READY) {
-            deferred = $.Deferred();
-            deferred.reject(Project.ERROR_ALREADY_EXISTS);
-            return deferred.promise();
+            return makeError(Project.ERROR_ALREADY_EXISTS);
           } else {
             this.state = Project.STATE_CREATING;
             return conn._sendCommand("pro_create", {
@@ -235,6 +238,22 @@
 
       })();
 
+      Device = (function() {
+        function Device(deviceId) {
+          this.deviceId = deviceId;
+        }
+
+        Device.prototype.run = function(conn, code) {
+          return conn._sendCommand("run_request", {
+            device_id: this.deviceId,
+            code: code
+          });
+        };
+
+        return Device;
+
+      })();
+
       IzanagiConnection.CONNECTION_TYPE = "ide";
 
       IzanagiConnection.DEFAULT_TIMEOUT = 5000;
@@ -262,7 +281,7 @@
           return showToast("please reload this web page");
         });
         this._validResponse = function(msg, command) {
-          return msg.data.result < 100 && msg.command === command + "_RES";
+          return msg.data.result < 100;
         };
         this._makePacket = function(command, data) {
           var rid, sid;
@@ -276,7 +295,7 @@
           return {
             type: IzanagiConnection.CONNECTION_TYPE,
             session_id: sid,
-            command: command + "_REQ",
+            command: command,
             request_id: rid,
             data: data
           };
@@ -330,15 +349,7 @@
           password: password,
           address: email,
           grade: grade
-        }).done((function(_this) {
-          return function(msg) {
-            return _this._user.setUser(userId, msg.session_id);
-          };
-        })(this)).fail((function(_this) {
-          return function(error) {
-            return _this._user.setUser(null, null);
-          };
-        })(this));
+        });
       };
 
       IzanagiConnection.prototype.getProjects = function() {
@@ -418,12 +429,39 @@
         });
       };
 
+      IzanagiConnection.prototype.getDevices = function() {
+        return this._sendCommand("who_android", {});
+      };
+
+      IzanagiConnection.prototype.runReuqest = function(deviceId, code) {
+        return this._sendCommand("run_request", {
+          device_id: deviceId,
+          code: code
+        });
+      };
+
       IzanagiConnection.prototype.setOnLogin = function(handler) {
         return this._user.onLogin = handler;
       };
 
       IzanagiConnection.prototype.setOnLogout = function(handler) {
         return this._user.onLogout = handler;
+      };
+
+      IzanagiConnection.prototype.setEventHandler = function(event, handler) {
+        return this._eventHandlers[event] = handler;
+      };
+
+      IzanagiConnection.prototype.setOnSendedCode = function(handler) {
+        return this.setEventHandler("sended_code", handler);
+      };
+
+      IzanagiConnection.prototype.setOnLogIDE = function(handler) {
+        return this._eventHandlers("log_ide", handler);
+      };
+
+      IzanagiConnection.prototype.setOnRunEndIDE = function(handler) {
+        return this._eventHandlers("run_end_ide", handler);
       };
 
       return IzanagiConnection;
