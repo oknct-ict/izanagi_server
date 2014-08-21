@@ -58,7 +58,7 @@ def register(data):
     if is_correct_str(data[USER], 16, LEN_ALPHA) != myconst.OK or \
         is_correct_str(data[PASS], 32, LEN_ALPHA) != myconst.OK or \
         is_correct_str(data[MAIL], 64, LEN) != myconst.OK:
-        return myconnst.DATA_NON_REGULATED;
+        return myconst.DATA_NON_REGULATED;
     return myconst.OK;
 
 def login(data):
