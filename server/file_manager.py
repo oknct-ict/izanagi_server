@@ -32,11 +32,11 @@ def delete(file_id):
 
 def get_lists(project_id):
     lists = g.db.files.find({PRO_ID:project_id});
-    file_list = {};
+    file_list = [];
     if lists is not None:
         for value in lists:
-            file_list.update({value[FILE_ID]:value[FILE_NAME]});
-    print file_list.values();
+            data = {FILE_ID:value[FILE_ID], FILE_NAME:value[FILE_NAME], DIR:value[DIR]};
+            file_list.append(data);
     return (file_list, myconst.OK);
 
 def rename(file_id, file_name):
