@@ -42,6 +42,14 @@ def receive_android(websock, session_id, command, data):
     if command == myconst.RUN_START:
         res = receive_android_run_start(session_id, data);
         command = myconst.NO_SEND;
+    # log
+    if command == myconst.LOG_ANDROID:
+        receive_android_log(session_id, data);
+        command = myconst.NO_SEND;
+    # run_end_android
+    if command == myconst.RUN_END_ANDROID:
+        receive_android_run_end(session_id, data);
+        command = myconst.NO_SEND;
 
     # response
     print session_id, command, data;
