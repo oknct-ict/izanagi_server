@@ -108,6 +108,9 @@ def send_to_ide(session_id, command, data):
         return;
     # send to ide
     mycommand.send_websock(websock, IDE, session_id, mycommand.get_request_id(), command, data);
+    if myconst.RUN_END_IDE is command:
+        # device manager disconnected
+        DEVICE_MANAGER.delete_session_id(IDE, session_id);
     
 def receive_android_run_start(session_id, data):
     # format check
@@ -126,5 +129,9 @@ def receive_android_log(session_id, data):
     send_to_ide(session_id, myconst.LOG_IDE, data); 
 
 def receive_android_run_end(session_id, data):
-    print True;
+    res = check_input.run_end(data);
+    if res != myconst.OK:
+       print myconst.RUN_END_ANDROID, res;
+    del data[DEVICE_ID];
+    send_to_ide(session_id, myconst.RUN_END_IDE, data);
 
