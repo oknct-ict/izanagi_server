@@ -52,7 +52,6 @@ class _ConnectionManager(object):
         # first time connectioned
         else:
             self._connection_count[connection_type].update({user_id:1});
-        print user_id, self._connection_count[connection_type][user_id];
         return session_id;
         
     '''
@@ -73,8 +72,6 @@ class _ConnectionManager(object):
             self._connection_count[connection_type][user_id] = count - 1;
         # connection delete
         del self._connections[connection_type][session_id];
-        print "now connected list";
-        self.output(connection_type);
         return;
         
     '''
@@ -124,9 +121,7 @@ class _ConnectionManager(object):
         keys = self._connections[connection_type].keys()
         for key in keys:
             if session_id == key:
-                print "session_id is exist";
                 return self._connections[connection_type][key][CONN];
-        print "session_id is not exist";
         return None;
         
     '''
@@ -141,9 +136,7 @@ class _ConnectionManager(object):
         keys = self._connections[connection_type].keys()
         for key in keys:
             if session_id == key:
-                print "get connection is ok.", self._connections[connection_type][key][USER];
                 return self._connections[connection_type][key][USER];
-        print "session_id is not exist";
         return None;
 
     '''

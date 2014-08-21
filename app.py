@@ -60,7 +60,9 @@ def websock_ide():
             session_id, request_id, command, data = get_json(json_data);
             session_id, data = myide.receive_ide(websock, session_id, command, data);
             mycommand.send_websock(websock, IDE, session_id, request_id, command, data);
-            print "ide:websock", websock;
+            print "devices";
+            DEVICE_MANAGER.output();
+            print;
     # sessin_id exist => disconnect
     CONNECTION_MANAGER.delete(IDE, session_id);
     DEVICE_MANAGER.delete_session_id(IDE, session_id);
@@ -94,10 +96,14 @@ def websock_android():
             session_id, request_id, command, data = get_json(json_data);
             session_id, command, data = myandroid.receive_android(websock, session_id, command, data);
             mycommand.send_websock(websock, ANDROID, session_id, request_id, command, data);
+            print "devices";
+            DEVICE_MANAGER.output();
+            print "connections";
+            CONNECTION_MANAGER.output(ANDROID);
             print;
     # sessin_id exist => disconnect
-    CONNECTION_MANAGER.delete(ANDROID, session_id);
     DEVICE_MANAGER.delete_session_id(ANDROID, session_id);
+    CONNECTION_MANAGER.delete(ANDROID, session_id);
     return "Disconnect";
 
 '''

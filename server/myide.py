@@ -297,27 +297,34 @@ def receive_ide_who_android(user_id):
     return (devices, myconst.OK);
 
 def receive_ide_run_request(data, session_id):
+    # format check
     res = check_input.run_request(data);
     if res != myconst.OK:
         return (res);
-    print "ko";
+    # get device_id and code
     device_id = data[DEVICE_ID];
     code = data[CODE];
+    # is alive device_id
     if DEVICE_MANAGER.is_device_id(device_id) is False:
-        return (myconst.DEVICE_ID_NO_EXISTING);
+        return (myconst.DEVICE_ID_NO_EXISTING); 
+    # device_id is alive, send request
     res = send_run_request(device_id, code, session_id);
     return (res);
 
 def send_run_request(device_id, code, ide_session_id):
+    # get sessin_id and websock
     session_id = DEVICE_MANAGER.get_session_android(device_id);
     websock = CONNECTION_MANAGER.get_connection(ANDROID, session_id);
+    # session_id or websock is none
     if session_id is None or websock is None:
         return (myconst.USER_NO_EXISTING);
+    # whether connected device_id and ide_session_id
     if DEVICE_MANAGER.connection(device_id, ide_session_id) is False:
         return (myconst.DEVICE_ID_NO_EXISTING);
+    # send prepare
     request_id = mycommand.get_request_id();
     data = {CODE:code};
-    print "kokomadekitayo";
+    # send to android 
     mycommand.send_websock(websock, ANDROID, session_id, request_id, myconst.RUN_START, data);
     return (myconst.OK);
 

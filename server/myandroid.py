@@ -83,19 +83,23 @@ def receive_android_login(websock, data):
     return (session_id, myconst.OK);
 
 def receive_android_run_start(session_id, data):
+    # format check
     res = check_input.run_start(data);
     if res != myconst.OK:
         return (res);
+    # get device_id
     device_id = DEVICE_MANAGER.get_device_id_from_android(session_id);
     if device_id is None:
         return (myconst.SESSION_ID_NO_EXISTING);
+    # get session_id
     session_id = DEVICE_MANAGER.get_session_ide(device_id);
     if session_id is None:
         return (myconst.DEVICE_ID_NO_EXISTING);
+    # get websock 
     websock = CONNECTION_MANAGER.get_connection(IDE, session_id);
     if websock is None:
         return (myconst.SESSION_ID_NO_EXISTING);
+    # send to ide
     mycommand.send_websock(websock, IDE, session_id, mycommand.get_request_id(), myconst.SENDED_CODE, data);
-    print "run_start[android -> ide]";
     return (myconst.OK);
     
