@@ -63,17 +63,6 @@ class _DeviceManger(object):
         return False;
     
     '''
-    IDEとAndroidがコネクションを張る
-    '''
-    def connection(self, device_id, session_id):
-        if self.is_device_id(device_id) is False:
-            return False;
-        data = self._devices[device_id];
-        data.update({IDE:session_id});
-        self._devices.update({device_id: data});
-        return True;
-    
-    '''
     IDEとAndroidがコネクションを張っているのか
     '''
     def is_connection_ide(self, device_id):
@@ -81,6 +70,19 @@ class _DeviceManger(object):
             if IDE in self._devices[device_id]:
                 return True;
         return False;
+    
+    '''
+    IDEとAndroidがコネクションを張る
+    '''
+    def connection(self, device_id, session_id):
+        if self.is_device_id(device_id) is False:
+            return False;
+        if self.is_connection_ide(device_id):
+            return False;
+        data = self._devices[device_id];
+        data.update({IDE:session_id});
+        self._devices.update({device_id: data});
+        return True;
     
     '''
     IDEとAndroidのコネクションを切断する
