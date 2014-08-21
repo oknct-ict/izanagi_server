@@ -16,6 +16,7 @@ RES         = myconst.RES
 PRO_ID      = myconst.PRO_ID
 PRO_NAME    = myconst.PRO_NAME
 PRO_LIST    = myconst.PRO_LIST
+PRO_LISTS   = myconst.PRO_LISTS
 FILE_ID     = myconst.FILE_ID
 FILE_NAME   = myconst.FILE_NAME
 FILE_LIST   = myconst.FILE_LIST
@@ -59,7 +60,7 @@ def receive_ide(websock, session_id, command, data):
     # project_list
     elif command == myconst.PRO_LIST:
         project_lists, res = receive_ide_pro_list(user_id);
-        data = {PRO_LIST:project_lists, RES:res};
+        data = {PRO_LISTS:project_lists, RES:res};
     # project_delete
     elif command == myconst.PRO_DELETE:
         res = receive_ide_pro_delete(user_id, data);

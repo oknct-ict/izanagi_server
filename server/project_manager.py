@@ -25,11 +25,11 @@ def rename(project_id, project_name):
 
 def get_lists(user_id):
     lists = g.db.projects.find({USER:user_id});
-    project_list = {};
+    project_list = [];
     if lists is not None:
         for value in lists:
-            project_list.update({value["project_id"]:value["project_name"]});
-    print project_list.values();
+            data = {"project_id":value["project_id"], "project_name":value["project_name"]};  
+            project_list.append(data);
     return (project_list, myconst.OK);
 
 '''
