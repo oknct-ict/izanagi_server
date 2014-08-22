@@ -46,7 +46,7 @@ def make_json(connect_type, session_id, request_id, command, data):
         "session_id":session_id,
         "request_id":request_id,
         "command":command,
-        "data":data});
+        "data":data}, ensure_ascii=False);
     return json_data;
 
 '''

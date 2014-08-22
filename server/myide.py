@@ -112,7 +112,7 @@ def receive_ide(websock, session_id, command, data):
         data = {RES:res, DEVICES:devices};
     # run_request
     elif command == myconst.RUN_REQUEST:
-        res = receive_ide_run_request(data, session_id);
+        res = receive_ide_run_request(user_id, data, session_id);
         data = {RES:res};
 
     # response
@@ -297,22 +297,43 @@ def receive_ide_who_android(user_id):
         devices.append({DEVICE_ID:device});
     return (devices, myconst.OK);
 
-def receive_ide_run_request(data, session_id):
+def receive_ide_run_request(user_id, data, session_id):
     # format check
     res = check_input.run_request(data);
     if res != myconst.OK:
         return (res);
     # get device_id and code
     device_id = data[DEVICE_ID];
-    code = data[CODE];
+    project_id = data[PRO_ID];
     # is alive device_id
     if DEVICE_MANAGER.is_device_id(device_id) == False:
         return (myconst.DEVICE_ID_NO_EXISTING); 
-    # device_id is alive, send request
-    res = send_run_request(device_id, code, session_id);
+    # make run_source from project_id 
+    code, res = make_run_code(user_id, project_id);
+    if res != myconst.OK:
+        return (res); 
+    # send code to android
+    res = send_run_android(device_id, code, session_id);
     return (res);
 
-def send_run_request(device_id, code, ide_session_id):
+def make_run_code(user_id, project_id):
+    if project_manager.is_valid_project_id(user_id, project_id) == False:
+        return ("", myconst.PROJECT_NO_EXISTING);
+    file_lists, res = file_manager.get_lists(project_id);
+    code = "";
+    main_iz = "";
+    # NOT main.iz file join
+    for data in file_lists:
+        if data[FILE_NAME] != myconst.MAIN_IZ:
+            part_code = file_manager._open(data[FILE_ID]);
+            code = code + part_code;
+        else:
+            main_iz = file_manager._open(data[FILE_ID]);
+    # main.iz file join
+    code = code + main_iz;
+    return (code.encode('utf-8'), myconst.OK);
+
+def send_run_android(device_id, code, ide_session_id):
     # get sessin_id and websock
     session_id = DEVICE_MANAGER.get_session_android(device_id);
     websock = CONNECTION_MANAGER.get_connection(ANDROID, session_id);

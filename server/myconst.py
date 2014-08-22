@@ -21,6 +21,7 @@ DEVICE_ID   = "device_id"
 JSON_ERROR  = "json_format_error"
 LOG         = "log"
 EXE_RES     = "execution_result"
+MAIN_IZ     = "main.iz"
 
 # result
 OK = 0
