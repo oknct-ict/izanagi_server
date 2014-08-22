@@ -148,17 +148,17 @@ def run_request(data):
     return myconst.OK
 
 def run_start(data):
-    if RES not in data:
+    if RES not in data or DEVICE_ID not in data:
         return myconst.DATA_DEFICIENCY;
     return myconst.OK;
 
 def log_android(data):
-    if LOG not in data:
+    if LOG not in data or DEVICE_ID not in data:
         return myconst.DATA_DEFICIENCY;
     return myconst.OK;
 
 def run_end(data):
-    if RES not in data or DEVICE_ID not in data:
+    if EXE_RES not in data or DEVICE_ID not in data:
         return myconst.DATA_DEFICIENCY
     return myconst.OK;
 

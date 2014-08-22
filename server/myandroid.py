@@ -117,6 +117,7 @@ def receive_android_run_start(session_id, data):
     res = check_input.run_start(data);
     if res != myconst.OK:
         print myconst.RUN_START, res;
+        return;
     send_to_ide(session_id, myconst.SENDED_CODE, data);
     
 def receive_android_log(session_id, data):
@@ -124,14 +125,13 @@ def receive_android_log(session_id, data):
     res = check_input.log_android(data);
     if res != myconst.OK:
         print myconst.LOG_ANDROID, res;
-    device_id = DEVICE_MANAGER.get_device_id_from_android(session_id);
-    data.update({DEVICE_ID:device_id});
+        return;
     send_to_ide(session_id, myconst.LOG_IDE, data); 
 
 def receive_android_run_end(session_id, data):
     res = check_input.run_end(data);
     if res != myconst.OK:
        print myconst.RUN_END_ANDROID, res;
-    del data[DEVICE_ID];
+       return;
     send_to_ide(session_id, myconst.RUN_END_IDE, data);
 
