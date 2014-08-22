@@ -17,6 +17,7 @@ CODE        = myconst.CODE
 DEVICE_DATA = myconst.DEVICE_DATA
 DEVICE_ID   = myconst.DEVICE_ID
 LOG         = myconst.LOG
+EXE_RES     = myconst.EXE_RES
 LEN         = 0;
 LEN_ALPHA   = 1;
 

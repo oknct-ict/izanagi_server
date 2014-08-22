@@ -108,7 +108,7 @@ def send_to_ide(session_id, command, data):
         return;
     # send to ide
     mycommand.send_websock(websock, IDE, session_id, mycommand.get_request_id(), command, data);
-    if myconst.RUN_END_IDE is command:
+    if myconst.RUN_END_IDE == command:
         # device manager disconnected
         DEVICE_MANAGER.delete_session_id(IDE, session_id);
     
